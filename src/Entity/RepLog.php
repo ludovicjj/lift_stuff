@@ -94,4 +94,12 @@ class RepLog
 
         $this->totalWeightLifted = $totalWeight;
     }
+
+    /**
+     * @return string[]
+     */
+    public static function getAllowedLiftItems()
+    {
+        return array_keys(self::ALLOWED_LIFT_ITEMS);
+    }
 }
