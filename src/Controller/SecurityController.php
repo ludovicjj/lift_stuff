@@ -7,10 +7,10 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
-class LoginController extends AbstractController
+class SecurityController extends AbstractController
 {
     #[Route('/login', name: 'login')]
-    public function index(AuthenticationUtils $authenticationUtils): Response
+    public function login(AuthenticationUtils $authenticationUtils): Response
     {
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
@@ -18,9 +18,15 @@ class LoginController extends AbstractController
         // last email entered by the user
         $lastEmail = $authenticationUtils->getLastUsername();
 
-        return $this->render('login/index.html.twig', [
+        return $this->render('security/login.html.twig', [
             'last_email' => $lastEmail,
             'error'         => $error,
         ]);
+    }
+
+    #[Route("/logout", name: "logout", methods: ["GET"])]
+    public function logout()
+    {
+        throw new \Exception('Don\'t forget to activate logout in security.yaml');
     }
 }
