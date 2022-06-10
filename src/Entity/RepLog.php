@@ -8,6 +8,13 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: RepLogRepository::class)]
 class RepLog
 {
+    const ALLOWED_LIFT_ITEMS = [
+        'chat' => '9',
+        'ordinateur' => '4.5',
+        'tasse_à_café' => '.5',
+        'gros_chat' => '18'
+    ];
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -22,8 +29,69 @@ class RepLog
     #[ORM\Column(name: "totalWeightLifted", type: "float")]
     private float $totalWeightLifted;
 
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: false)]
+    private User $user;
+
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function setReps(int $reps): self
+    {
+        $this->reps = $reps;
+        return $this;
+    }
+
+    public function getReps(): int
+    {
+        return $this->reps;
+    }
+
+    public function setItem($item): self
+    {
+        if (!array_key_exists($item, self::ALLOWED_LIFT_ITEMS)) {
+            throw new \InvalidArgumentException(sprintf('Oops, vous ne pouvez pas levez "%s" !', $item));
+        }
+
+        $this->item = $item;
+        $this->calculateTotalLifted();
+        return $this;
+    }
+
+    public function getItem(): string
+    {
+        return $this->item;
+    }
+
+    public function getTotalWeightLifted(): float
+    {
+        return $this->totalWeightLifted;
+    }
+
+    public function getUser(): User
+    {
+        return $this->user;
+    }
+
+    public function setUser(User $user): self
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    private function calculateTotalLifted()
+    {
+        if (!$this->getItem()) {
+            return;
+        }
+
+        // forcer le type en float ?
+        $weight = self::ALLOWED_LIFT_ITEMS[$this->getItem()];
+        $totalWeight = $this->getReps() * $weight;
+
+        $this->totalWeightLifted = $totalWeight;
     }
 }
