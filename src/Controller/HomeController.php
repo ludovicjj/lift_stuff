@@ -18,7 +18,6 @@ class HomeController extends AbstractController
             'run'
         ];
 
-        dump($data);
         return $this->render('home/index.html.twig',[
             'data' => $data
         ]);
