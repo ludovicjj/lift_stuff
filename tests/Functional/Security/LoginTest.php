@@ -3,7 +3,6 @@
 namespace App\Tests\Functional\Security;
 
 use App\Factory\UserFactory;
-use JetBrains\PhpStorm\NoReturn;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -28,7 +27,7 @@ class LoginTest extends WebTestCase
         $urlGenerator = $client->getContainer()->get("router");
         $crawler = $client->request(Request::METHOD_GET, $urlGenerator->generate('login'));
 
-        $form = $crawler->filter('form')->form([
+        $form = $crawler->filter('form[name=login]')->form([
             '_email' => "john@example.com",
             '_password' => "pass-123"
         ]);
@@ -51,7 +50,7 @@ class LoginTest extends WebTestCase
         $urlGenerator = $client->getContainer()->get("router");
         $crawler = $client->request(Request::METHOD_GET, $urlGenerator->generate('login'));
 
-        $form = $crawler->filter('form')->form([
+        $form = $crawler->filter('form[name=login]')->form([
             '_email' => "john@example.com",
             '_password' => "fail",
         ]);
@@ -60,7 +59,7 @@ class LoginTest extends WebTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
         $client->followRedirect();
         $this->assertRouteSame("login");
-        $this->assertSelectorTextContains("div.alert-error", "Invalid credentials.");
+        $this->assertSelectorTextContains("div.alert-danger", "Invalid credentials.");
     }
 
     public function testLoginWithWrongEmail(): void
@@ -75,7 +74,7 @@ class LoginTest extends WebTestCase
         $urlGenerator = $client->getContainer()->get("router");
         $crawler = $client->request(Request::METHOD_GET, $urlGenerator->generate('login'));
 
-        $form = $crawler->filter('form')->form([
+        $form = $crawler->filter('form[name=login]')->form([
             '_email' => "fail@example.com",
             '_password' => "pass-123",
         ]);
@@ -84,7 +83,7 @@ class LoginTest extends WebTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
         $client->followRedirect();
         $this->assertRouteSame("login");
-        $this->assertSelectorTextContains("div.alert-error", "Invalid credentials.");
+        $this->assertSelectorTextContains("div.alert-danger", "Invalid credentials.");
     }
 
     public function testLoginWithWrongCsrfToken(): void
@@ -99,7 +98,7 @@ class LoginTest extends WebTestCase
         $urlGenerator = $client->getContainer()->get("router");
         $crawler = $client->request(Request::METHOD_GET, $urlGenerator->generate('login'));
 
-        $form = $crawler->filter('form')->form([
+        $form = $crawler->filter('form[name=login]')->form([
             '_email' => "test@example.com",
             '_password' => "pass-123",
             "_csrf_token" => "wrong_csrf_token"
@@ -109,6 +108,6 @@ class LoginTest extends WebTestCase
         $this->assertResponseStatusCodeSame(Response::HTTP_FOUND);
         $client->followRedirect();
         $this->assertRouteSame("login");
-        $this->assertSelectorTextContains("div.alert-error", "Invalid CSRF token.");
+        $this->assertSelectorTextContains("div.alert-danger", "Invalid CSRF token.");
     }
 }
