@@ -1,24 +1,42 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello LoginController!{% endblock %}
+{% block title %}Login{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+{% endblock %}
 
 {% block body %}
-    {% if error %}
-        <div class="alert-error">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
-    {% endif %}
+    <div class="card card-login">
+        <div class="card-img" style="background-image: url({{ image_url }})">
+            <div class="author">
+                <span>{{ author_name }}</span>
+                <img alt="author_avatar" src="{{ author_avatar }}">
+            </div>
+        </div>
+        <div class="card-body">
+            <h5 class="card-title mb-3">Login you account</h5>
+            {% if error %}
+                <div class="alert-error">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+            {% endif %}
+            <form name="login" action="{{ path('login') }}" method="post">
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="text" class="form-control" id="email" name="_email" value="{{ last_email }}"/>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password:</label>
+                    <input type="password" class="form-control" id="password" name="_password"/>
+                </div>
 
-    <form action="{{ path('login') }}" method="post">
-        <label for="email">Email:</label>
-        <input type="text" id="email" name="_email" value="{{ last_email }}"/>
-
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="_password"/>
-
-        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-
-        {# If you want to control the URL the user is redirected to on success
+                {# If you want to control the URL the user is redirected to on success
         <input type="hidden" name="_target_path" value="/account"/> #}
-
-        <button type="submit">login</button>
-    </form>
+                <div class="wrapper-login-action">
+                    <button class="btn btn-custom" type="submit">Login</button>
+                    <a class="btn btn-outline-custom" href="#" role="button">Register</a>
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock %}
