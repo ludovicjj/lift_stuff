@@ -17,7 +17,7 @@
         <div class="card-body">
             <h5 class="card-title mb-3">Login you account</h5>
             {% if error %}
-                <div class="alert-error">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {{  include("components/alert.html.twig", {state: "danger", content: error.messageKey|trans(error.messageData, 'security')}) }}
             {% endif %}
             <form name="login" action="{{ path('login') }}" method="post">
                 <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
