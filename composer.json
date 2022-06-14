@@ -16,11 +16,13 @@
         "symfony/debug-bundle": "5.4.*",
         "symfony/dotenv": "*",
         "symfony/flex": "^1.17|^2",
+        "symfony/form": "5.4.*",
         "symfony/framework-bundle": "*",
         "symfony/http-client": "5.4.*",
         "symfony/proxy-manager-bridge": "5.4.*",
         "symfony/runtime": "*",
         "symfony/security-bundle": "5.4.*",
+        "symfony/validator": "5.4.*",
         "symfony/yaml": "*"
     },
     "config": {

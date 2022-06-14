@@ -1,3 +1,19 @@
-.lift-history {
-    background-color: var(--white-color);
+form[name="lift_form"] .row {
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+form[name="lift_form"] .row >.col {
+    flex: 1 1 auto;
+}
+
+form[name="lift_form"] .row .col:last-child {
+    max-width: fit-content;
+}
+
+/* style for screen >= 576px */
+@media (min-width: 576px) {
+    form[name="lift_form"] .row {
+        flex-wrap: nowrap;
+        gap: 0;
+    }
 }

@@ -1,0 +1,24 @@
+{{ form_start(formLift, {
+    'attr': {
+        'novalidate': 'novalidate',
+    }
+}) }}
+    {{ form_errors(formLift) }}
+
+    <div class="row">
+        {{ form_row(formLift.item, {
+            'row_attr': {
+                'class': 'col',
+            }
+        }) }}
+        {{ form_row(formLift.reps, {
+            'row_attr': {
+                'class': 'col',
+            },
+            'attr': {'placeholder': 'How many times?'}
+        }) }}
+        <div class="col">
+            <button type="submit" class="btn btn-primary">I Lifted it!</button>
+        </div>
+    </div>
+{{ form_end(formLift) }}

@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\RepLogRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: RepLogRepository::class)]
 class RepLog
@@ -23,9 +24,14 @@ class RepLog
     private int $id;
 
     #[ORM\Column(name: 'reps', type: 'integer')]
+    #[
+        Assert\NotBlank(message: "how many times did you lift this ?"),
+        Assert\GreaterThan(value: 0, message: "You can certainly lift more than just 0 !")
+    ]
     private int $reps;
 
     #[ORM\Column(name: "item", type: "string", length: 50)]
+    #[Assert\NotBlank(message: "What did you lift ?")]
     private string $item;
 
     #[ORM\Column(name: "totalWeightLifted", type: "float")]
@@ -70,6 +76,16 @@ class RepLog
     public function getItemLabel(): string
     {
         return self::ITEM_LABEL_PREFIX.$this->getItem();
+    }
+
+    public static function getLiftedItemChoices(): array
+    {
+        $items = array_keys(self::ALLOWED_LIFT_ITEMS);
+        $choices = [];
+        foreach($items as $item) {
+            $choices[str_replace('_', ' ', $item)] = $item;
+        }
+        return $choices;
     }
 
     public function getTotalWeightLifted(): float
