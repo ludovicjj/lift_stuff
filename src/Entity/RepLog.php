@@ -15,6 +15,8 @@ class RepLog
         'gros_chat' => '18'
     ];
 
+    const ITEM_LABEL_PREFIX = "liftable_thing.";
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -65,6 +67,11 @@ class RepLog
         return $this->item;
     }
 
+    public function getItemLabel(): string
+    {
+        return self::ITEM_LABEL_PREFIX.$this->getItem();
+    }
+
     public function getTotalWeightLifted(): float
     {
         return $this->totalWeightLifted;
@@ -98,7 +105,7 @@ class RepLog
     /**
      * @return string[]
      */
-    public static function getAllowedLiftItems()
+    public static function getAllowedLiftItems(): array
     {
         return array_keys(self::ALLOWED_LIFT_ITEMS);
     }
