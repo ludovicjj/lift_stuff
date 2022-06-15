@@ -10,7 +10,6 @@ main {
     flex-direction: row-reverse;
     width: 80%;
     height: 790px;
-    border-radius: 0;
     box-shadow: 0 0 15px rgba(0,0,0,0.3);
     border: none;
 }
@@ -22,6 +21,8 @@ main {
     background-position: center center;
     display: flex;
     padding: 1rem;
+    border-bottom-left-radius: 0;
+    border-top-left-radius: 0;
 }
 .card-img .author{
     display: flex;
@@ -44,6 +45,7 @@ main {
     justify-content: center;
 }
 .card-body h5 {
+    color: var(--sand-color);
 }
 
 .wrapper-login-action {

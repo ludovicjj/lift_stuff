@@ -15,7 +15,7 @@
             </div>
         </div>
         <div class="card-body">
-            <h5 class="card-title mb-3">Login you account</h5>
+            <h5 class="card-title mb-3">Login your account</h5>
             {% if error %}
                 {{  include("components/alert.html.twig", {state: "danger", content: error.messageKey|trans(error.messageData, 'security')}) }}
             {% endif %}
@@ -31,7 +31,7 @@
                 </div>
 
                 {# If you want to control the URL the user is redirected to on success
-        <input type="hidden" name="_target_path" value="/account"/> #}
+                <input type="hidden" name="_target_path" value="/account"/> #}
                 <div class="wrapper-login-action">
                     <button class="btn btn-custom" type="submit">Login</button>
                     <a class="btn btn-outline-custom" href="#" role="button">Register</a>
