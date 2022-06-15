@@ -47,14 +47,18 @@ class HomeController extends AbstractController
             'user' => $this->getUser()
         ]);
         $totalWeight = 0;
+        $totalReps = 0;
         foreach ($repLogs as $repLog) {
             $totalWeight += $repLog->getTotalWeightLifted();
+            $totalReps += $repLog->getReps();
         }
 
         return $this->render('home/index.html.twig',[
             'repLogs' => $repLogs,
             'totalWeight' => $totalWeight,
-            'formLift' => $form->createView()
+            'totalReps' => $totalReps,
+            'formLift' => $form->createView(),
+            'items' => RepLog::ALLOWED_LIFT_ITEMS
         ]);
     }
 }

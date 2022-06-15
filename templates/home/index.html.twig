@@ -1,52 +1,67 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-    {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
 {% endblock %}
 
 {% block body %}
-    <div class="row mt-3">
-        <div class="col-md-7">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="mb-3">Your Lift History</h5>
-                    <table class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th>What</th>
-                            <th>How many time</th>
-                            <th>Weight</th>
-                            <th>&nbsp;</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for repLog in repLogs %}
-                            <tr>
-                                <td>{{ repLog.itemLabel|replace({'liftable_thing.': "", "_": " "})|title }}</td>
-                                <td>{{ repLog.reps }}</td>
-                                <td>{{ repLog.totalWeightLifted }}</td>
-                                <td>&nbsp;</td>
-                            </tr>
-                        {% else %}
-                            <tr>
-                                <td colspan="4">Let's start to lift something !</td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                        <tfoot>
-                        <tr>
-                            <td>&nbsp;</td>
-                            <th>Total</th>
-                            <th>{{ totalWeight }}</th>
-                            <td>&nbsp;</td>
-                        </tr>
-                        </tfoot>
-                    </table>
-                    {{ include('home/_form.html.twig') }}
-
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="card card-reps">
+                <div class="card-body p-0">
+                    <div class="row g-0">
+                        <div class="col-md-3 card-info">
+                            <div>
+                                <h6>items</h6>
+                                <h2 class="mb-3">Your Lift History</h2>
+                            </div>
+                            <a href="#" id="item-info">View items info <i class="fas fa-chevron-right"></i></a>
+                        </div>
+                        <div class="col-md-9 card-content">
+                            <div class="table-responsive mb-3">
+                                <table class="table table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>What</th>
+                                        <th>How many time</th>
+                                        <th>Weight</th>
+                                        <th>&nbsp;</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for repLog in repLogs %}
+                                        <tr>
+                                            <td>{{ repLog.itemLabel|replace({'liftable_thing.': "", "_": " "})|title }}</td>
+                                            <td>{{ repLog.reps }}</td>
+                                            <td>{{ repLog.totalWeightLifted }}</td>
+                                            <td>&nbsp;</td>
+                                        </tr>
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="4">Let's start to lift something !</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td class="fw-bold">Total</td>
+                                            <td class="fw-bold">{{ totalReps }}</td>
+                                            <td class="fw-bold">{{ totalWeight }}</td>
+                                            <td>&nbsp;</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                            {{ include('home/_form.html.twig') }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+    {{ include('components/modal_items.html.twig') }}
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{{ asset('js/home.js') }}"></script>
 {% endblock %}

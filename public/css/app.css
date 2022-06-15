@@ -1,7 +1,11 @@
+@import url('https://fonts.googleapis.com/css2?family=Mulish&display=swap');
 :root {
     --sand-color: #dd9a6f;
     --sand-dark-color: #ce9975;
     --white-color: #fff;
+    --blue-color: #2A265F;
+    --blue-hover-color: #7271bb;
+    --scroll-bar-color: #f1f1f1;
     --bs-gray-100: #f8f9fa;
     --bs-gray-200: #e9ecef;
     --bs-gray-300: #dee2e6;
@@ -14,6 +18,7 @@
 }
 body {
     background-color: var(--bs-gray-200);
+    font-family: 'Mulish', sans-serif;
 }
 .container {
     display: flex;
@@ -26,6 +31,10 @@ main {
 
 .btn-custom {
     background-color: var(--sand-color);
+    color: var(--white-color);
+}
+.btn-blue {
+    background-color: var(--blue-color);
     color: var(--white-color);
 }
 .btn-outline-custom {
@@ -44,6 +53,11 @@ main {
     border: 1px var(--sand-dark-color) solid;
     background-color: var(--sand-dark-color);
     color: var(--white-color);
+}
+.btn-blue:hover {
+    background-color: var(--white-color);
+    color: var(--blue-color);
+    box-shadow: 0 5px 5px rgb(0 0 0 / 20%);
 }
 
 

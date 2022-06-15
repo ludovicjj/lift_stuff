@@ -1,0 +1,25 @@
+<!-- Modal -->
+<div class="modal fade" id="itemInfoModal" tabindex="-1" aria-labelledby="itemInfoModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Weight</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for item, weight in items %}
+                        <tr>
+                            <td>{{ item|replace({"_": " "})|title }}</td>
+                            <td>{{ weight }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
