@@ -26,7 +26,7 @@ class HomeTest extends WebTestCase
         // user is now logged in, so you can test protected resources
         $client->request(Request::METHOD_GET, "/");
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h5', 'Your Lift History');
+        $this->assertSelectorTextContains('h2', 'Your Lift History');
         $this->assertSelectorTextContains('td[colspan=4]', "Let's start to lift something !");
     }
 }
