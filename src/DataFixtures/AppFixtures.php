@@ -12,18 +12,19 @@ class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
-        $user = UserFactory::createOne(['email' => 'user@example.com', 'password' => 'pass-42']);
+        $names = ['Diane', 'Cindy', 'John', 'Ron', 'Luc', 'Fuzz'];
         $items = array_flip(RepLog::getAllowedLiftItems());
 
-        RepLogFactory::createMany(
-            3,
-            function () use ($user, $items) {
-                return [
-                    'reps' => rand(1, 30),
-                    'item' => array_rand($items),
-                    'user' => $user
-                ];
-            }
-        );
+        foreach ($names as $name) {
+            $user = UserFactory::new()
+                ->withEmail(strtolower($name).'@example.com')
+                ->create()
+            ;
+            RepLogFactory::new(['user' => $user])
+                ->withItem($items)
+                ->many(rand(1, 5))
+                ->create()
+            ;
+        }
     }
 }

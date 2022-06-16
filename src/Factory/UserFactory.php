@@ -39,9 +39,9 @@ final class UserFactory extends ModelFactory
     {
         return [
             // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
-            'email' => 'test@example.com',
+            'email' => self::faker()->unique()->safeEmail(),
             'roles' => [],
-            'password' => '1234',
+            'password' => 'pump-up',
         ];
     }
 
@@ -53,6 +53,13 @@ final class UserFactory extends ModelFactory
                 $user->setPassword($this->passwordHasher->hashPassword($user, $user->getPassword()));
             })
         ;
+    }
+
+    public function withEmail(string $email = null): self
+    {
+        return $this->addState(function() use ($email) {
+            return ['email' => $email ?? self::faker()->unique()->safeEmail()];
+        });
     }
 
     protected static function getClass(): string
