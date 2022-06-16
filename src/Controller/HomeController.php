@@ -58,7 +58,22 @@ class HomeController extends AbstractController
             'totalWeight' => $totalWeight,
             'totalReps' => $totalReps,
             'formLift' => $form->createView(),
-            'items' => RepLog::ALLOWED_LIFT_ITEMS
+            'items' => RepLog::ALLOWED_LIFT_ITEMS,
+            'leadBoard' => $this->getLeadBoard()
         ]);
+    }
+
+    private function getLeadBoard(): array
+    {
+        $leadBoardDetails = $this->repLogRepository->getLeadBoardDetails();
+        $leadBoard = [];
+
+        foreach ($leadBoardDetails as $detail) {
+            $leadBoard[] = [
+                'weight' => $detail['weightSum'],
+                'username' => strstr($detail['user_email'],'@', true)
+            ];
+        }
+        return $leadBoard;
     }
 }
