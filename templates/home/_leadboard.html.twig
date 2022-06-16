@@ -1,0 +1,16 @@
+<table class="table table-hover leaderboard-table">
+    <thead>
+    <tr>
+        <th class="text-center">Username</th>
+        <th class="text-center">Weight Lifted</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for lead in leadBoard %}
+        <tr>
+            <td class="text-center">{{ lead.username }}</td>
+            <td class="text-center">{{ lead.weight }} lbs</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

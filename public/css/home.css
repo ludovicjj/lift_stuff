@@ -39,11 +39,10 @@ form[name="lift_form"] .row .col:last-child {
     margin: 0;
     font-size: 0.67rem;
 }
-.card-reps .card-info h2 {
+.card-reps .card-info h2, .card-leaderboard h2.card-title {
     letter-spacing: 1px;
     font-size: 1.5rem;
     font-weight: bold;
-    margin: 1rem 0;
 }
 .card-reps .card-info a {
     letter-spacing: 1px;
@@ -64,7 +63,7 @@ form[name="lift_form"] .row .col:last-child {
     border-spacing: 0 10px;
     margin: -10px 0 0 0;
 }
-tbody::after
+.card-reps tbody::after
 {
     content: '';
     display: block;
@@ -129,4 +128,66 @@ tbody::after
 #itemInfoModal table thead tr th:last-child {
     border-top-right-radius: 6px;
 
+}
+
+/* leaderboard table */
+.panel-wrapper .panel table {
+    border-collapse: separate;
+    border-spacing: 0 10px;
+    margin: -10px 0;
+}
+.panel-wrapper .panel table tbody td{
+    background-color: #f7f7f7;
+    color: gray;
+    padding: 10px 0;
+}
+.panel-wrapper .panel table tbody td:first-child{
+    border-radius: 10px 0 0 10px;
+}
+.panel-wrapper .panel table tbody td:last-child{
+    border-radius: 0 10px  10px 0;
+}
+/* leaderboard accordion */
+/* Style the buttons that are used to open and close the accordion panel */
+.accordion-btn {
+    background-color: var(--blue-color);
+    color: var(--white-color);
+    border-radius: .375rem;
+    cursor: pointer;
+    padding: 1rem 2rem;
+    border: 1px solid rgba(0,0,0,.175);
+    width: 100%;
+    text-align: left;
+    transition: border-radius .3s;
+    display: flex;
+    justify-content: space-between;
+}
+.accordion-custom.show .accordion-btn{
+    border-radius: .375rem .375rem 0 0;
+}
+.accordion-btn i {
+    transition: transform .3s;
+}
+.accordion-btn.active {
+    border-radius: .375rem .375rem 0 0;
+}
+.accordion-custom.show .accordion-btn.active {
+    border-radius: .375rem;
+}
+/* Style the accordion panel. Note: hidden by default */
+.panel-wrapper {
+    padding: 0 2rem;
+    background-color: var(--white-color);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height .3s ease-out;
+}
+.accordion-custom.show .panel-wrapper {
+    max-height: fit-content;
+}
+.panel {
+    padding: 1rem 0 2rem;
+}
+.panel .table-responsive {
+    max-height: 265px;
 }

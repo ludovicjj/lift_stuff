@@ -39,7 +39,7 @@ final class RepLogFactory extends ModelFactory
     {
         return [
             // TODO add your default values here (https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories)
-            'reps' => 5,
+            'reps' => rand(1, 30),
             'item' => 'chat',
         ];
     }
@@ -50,6 +50,13 @@ final class RepLogFactory extends ModelFactory
         return $this
             // ->afterInstantiate(function(RepLog $repLog): void {})
         ;
+    }
+
+    public function withItem(array $items = []): self
+    {
+        return $this->addState(function () use($items) {
+           return ['item' => !empty($items) ? array_rand($items) : 'chat'];
+        });
     }
 
     protected static function getClass(): string

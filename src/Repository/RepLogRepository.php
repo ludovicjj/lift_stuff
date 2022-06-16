@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\RepLog;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -37,6 +39,17 @@ class RepLogRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function getLeadBoardDetails(): array
+    {
+        return $this->createQueryBuilder('rl')
+            ->select('IDENTITY(rl.user) as user_id, SUM(rl.totalWeightLifted) as weightSum, u.email as user_email')
+            ->innerJoin(User::class, 'u', Join::WITH, 'u.id = user_id')
+            ->groupBy('user_id')
+            ->orderBy('weightSum', 'DESC')
+            ->getQuery()
+            ->execute();
     }
 
 //    /**

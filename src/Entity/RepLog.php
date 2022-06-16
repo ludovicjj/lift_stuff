@@ -10,10 +10,10 @@ use Symfony\Component\Validator\Constraints as Assert;
 class RepLog
 {
     const ALLOWED_LIFT_ITEMS = [
-        'chat' => '9',
-        'ordinateur' => '4.5',
-        'tasse_à_café' => '.5',
-        'gros_chat' => '18'
+        'cat' => '9',
+        'laptop' => '4.5',
+        'coffee_cup' => '.5',
+        'fat_cat' => '18'
     ];
 
     const ITEM_LABEL_PREFIX = "liftable_thing.";
