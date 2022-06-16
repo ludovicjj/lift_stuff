@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block body %}
-    <div class="row mt-5 mb-3">
+    <div class="row my-5">
         <div class="col-12">
             <div class="card card-reps">
                 <div class="card-body p-0">
@@ -13,9 +13,9 @@
                         <div class="col-md-3 card-info">
                             <div>
                                 <h6>items</h6>
-                                <h2 class="mb-3">Your Lift History</h2>
+                                <h2 class="my-3">Your Lift History</h2>
                             </div>
-                            <a href="#" id="item-info">View items info <i class="fas fa-chevron-right"></i></a>
+                            <a href="#" id="item-info">View items info <i class="fa-solid fa-chevron-right"></i></a>
                         </div>
                         <div class="col-md-9 card-content">
                             <div class="table-responsive mb-3">
@@ -59,9 +59,23 @@
             </div>
         </div>
     </div>
-    <div class="row">
+
+
+    <div class="row my-5">
         <div class="col-12">
-            {{ include('home/_leadboard.html.twig') }}
+            <div class="accordion-custom show">
+                <button class="accordion-btn">
+                    <span>Lift Leader Board</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <div class="panel-wrapper">
+                    <div class="panel">
+                        <div class="table-responsive">
+                            {{ include('home/_leadboard.html.twig') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
