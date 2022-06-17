@@ -2,17 +2,17 @@
 
 namespace App\EventSubscriber;
 
+use App\Security\RepLogVoter;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\Security\Core\Security;
 
 class RepLogSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private RequestStack $requestStack)
+    public function __construct(private Security $security)
     {
     }
 
@@ -29,13 +29,9 @@ class RepLogSubscriber implements EventSubscriberInterface
         if (!$exception instanceof AccessDeniedException) {
             return;
         }
-        $request = $this->requestStack->getCurrentRequest();
 
-        if (!$request) {
-            return;
-        }
-
-        if ($request->isXmlHttpRequest()) {
+        // Customize your response object to display the exception details
+        if ($event->getRequest()->isXmlHttpRequest() && $exception->getAttributes() === RepLogVoter::DELETE) {
             $event->setResponse(new JsonResponse([
                 'error' => $exception->getMessage(),
                 'code' => $exception->getCode()
