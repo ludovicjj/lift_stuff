@@ -9,13 +9,10 @@ form[name="lift_form"] .row >.col {
 form[name="lift_form"] .row .col:last-child {
     max-width: fit-content;
 }
-
-/* style for screen >= 576px */
-@media (min-width: 576px) {
-    form[name="lift_form"] .row {
-        flex-wrap: nowrap;
-        gap: 0;
-    }
+/* fix btn delete rep before load icon */
+.js-delete-rep-log {
+    min-width: 32px;
+    min-height: 31px;
 }
 .card-reps {
     overflow: hidden;
@@ -53,10 +50,10 @@ form[name="lift_form"] .row .col:last-child {
     display: block;
     margin-top: 30px;
 }
-/* table rep*/
+/********* table rep *********/
 .card-reps .card-content .table-responsive {
     height: fit-content;
-    max-height:210px;
+    max-height:230px;
 }
 .card-reps .card-content table {
     border-collapse: separate;
@@ -68,6 +65,16 @@ form[name="lift_form"] .row .col:last-child {
     content: '';
     display: block;
     height: 5px;
+}
+.card-reps table tbody tr {
+    opacity: 1;
+    transition: opacity .5s;
+}
+.card-reps table tbody tr.hide {
+    opacity: 0;
+}
+.card-reps table tbody tr.hide.out {
+    display: none;
 }
 .card-reps .card-content table td {
     background-color: #f7f7f7;
@@ -84,33 +91,7 @@ form[name="lift_form"] .row .col:last-child {
     border-bottom-right-radius: 10px;
 }
 
-/* width */
-::-webkit-scrollbar {
-    width: 10px;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-    background: var(--scroll-bar-color);
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background:var(--blue-color);
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: var(--blue-hover-color);
-}
-.table-responsive {
-    padding-right: 5px;
-    overflow-y: scroll;
-    scrollbar-color: var(--blue-color) #c9c8c8;
-    scrollbar-width: thin;
-}
-
-/* Modal Items Info */
+/******* Modal Items Info *********/
 #itemInfoModal table {
     margin-bottom: 0;
 }
@@ -190,4 +171,12 @@ form[name="lift_form"] .row .col:last-child {
 }
 .panel .table-responsive {
     max-height: 265px;
+}
+
+/* style for screen >= 576px */
+@media (min-width: 576px) {
+    form[name="lift_form"] .row {
+        flex-wrap: nowrap;
+        gap: 0;
+    }
 }
