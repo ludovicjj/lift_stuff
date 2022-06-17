@@ -34,7 +34,11 @@
                                             <td>{{ repLog.itemLabel|replace({'liftable_thing.': "", "_": " "})|title }}</td>
                                             <td>{{ repLog.reps }}</td>
                                             <td>{{ repLog.totalWeightLifted }}</td>
-                                            <td>&nbsp;</td>
+                                            <td>
+                                                <a href="#" class="js-delete-rep-log">
+                                                    <i class="fa-solid fa-ban"></i>
+                                                </a>
+                                            </td>
                                         </tr>
                                     {% else %}
                                         <tr>
