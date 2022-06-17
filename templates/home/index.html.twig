@@ -1,7 +1,13 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
+    {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/home.js') }}" defer></script>
 {% endblock %}
 
 {% block body %}
@@ -19,7 +25,7 @@
                         </div>
                         <div class="col-md-9 card-content">
                             <div class="table-responsive mb-3">
-                                <table class="table table-hover">
+                                <table class="table table-hover js-rep-log-table">
                                     <thead>
                                     <tr>
                                         <th>What</th>
@@ -35,7 +41,7 @@
                                             <td>{{ repLog.reps }}</td>
                                             <td>{{ repLog.totalWeightLifted }}</td>
                                             <td>
-                                                <a href="#" class="js-delete-rep-log">
+                                                <a class="btn btn-blue btn-sm js-delete-rep-log" role="button" data-url="{{ path('rep_log_delete', {id: repLog.id}) }}">
                                                     <i class="fa-solid fa-ban"></i>
                                                 </a>
                                             </td>
@@ -84,8 +90,4 @@
     </div>
 
     {{ include('components/modal_items.html.twig') }}
-{% endblock %}
-
-{% block javascripts %}
-    <script src="{{ asset('js/home.js') }}"></script>
 {% endblock %}
