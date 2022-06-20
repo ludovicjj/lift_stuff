@@ -18,8 +18,6 @@ class RepLogApp {
         const deleteBtn = e.currentTarget;
         const deleteUrl = deleteBtn.getAttribute('data-url');
         const row = deleteBtn.closest('tr');
-        const totalWeight = this.wrapper.querySelector('.js-total-weight');
-        const newWeight = totalWeight.textContent - row.getAttribute('data-weight');
         const tableContainer = this.wrapper.closest('.table-responsive');
 
         this.toggleDisabledButton(deleteBtn);
@@ -38,10 +36,10 @@ class RepLogApp {
                 const data = isJson ? await response.json() : null;
 
                 if (response.ok) {
-                    totalWeight.textContent = newWeight.toString();
                     row.classList.add('hide');
                     setTimeout(() => {
-                        row.classList.add('out');
+                        row.remove();
+                        this.updateTotalWeightLifted()
                         if (tableContainer.scrollHeight <= 230) {
                             tableContainer.style.overflowY = "visible";
                             tableContainer.style.paddingRight = `${0}px`;
@@ -61,6 +59,15 @@ class RepLogApp {
 
     handleRowClick() {
         console.log('Row clicked')
+    }
+
+    updateTotalWeightLifted () {
+        let totalWeight = 0;
+        this.wrapper.querySelectorAll('tbody tr').forEach(function (row) {
+           totalWeight += parseFloat(row.getAttribute('data-weight'));
+        })
+
+        this.wrapper.querySelector('.js-total-weight').textContent = totalWeight.toString();
     }
 
     /**
