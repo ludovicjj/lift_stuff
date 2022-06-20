@@ -73,9 +73,6 @@ form[name="lift_form"] .row .col:last-child {
 .card-reps table tbody tr.hide {
     opacity: 0;
 }
-.card-reps table tbody tr.hide.out {
-    display: none;
-}
 .card-reps .card-content table td {
     background-color: #f7f7f7;
     color: gray;
