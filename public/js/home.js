@@ -21,7 +21,11 @@ tableDeleteLinks.forEach(deleteLink => {
         // disabled button
         e.currentTarget.classList.add('disabled');
         e.currentTarget.setAttribute('aria-disabled', true);
+
+        // DOM
         const row = e.currentTarget.closest('tr');
+        const totalWeight = tableRep.querySelector('.js-total-weight');
+        const totalWeightUpdated = totalWeight.textContent - row.getAttribute('data-weight');
 
         // icon spinner
         const icon = e.currentTarget.querySelector('.fa-ban');
@@ -41,6 +45,7 @@ tableDeleteLinks.forEach(deleteLink => {
             const response = await fetch(deleteUrl, init);
             if (response.ok) {
                 row.classList.add('hide');
+                totalWeight.textContent = totalWeightUpdated.toString()
                 setTimeout(() => {
                     row.classList.add('out');
                 }, 500)
