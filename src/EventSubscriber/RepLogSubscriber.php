@@ -8,13 +8,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
-use Symfony\Component\Security\Core\Security;
 
 class RepLogSubscriber implements EventSubscriberInterface
 {
-    public function __construct(private Security $security)
-    {
-    }
 
     public static function getSubscribedEvents(): array
     {
@@ -31,9 +27,12 @@ class RepLogSubscriber implements EventSubscriberInterface
         }
 
         // Customize your response object to display the exception details
-        if ($event->getRequest()->isXmlHttpRequest() && $exception->getAttributes() === RepLogVoter::DELETE) {
+        if (
+            $event->getRequest()->isXmlHttpRequest() &&
+            in_array(RepLogVoter::DELETE, $exception->getAttributes())
+        ) {
             $event->setResponse(new JsonResponse([
-                'error' => $exception->getMessage(),
+                'message' => $exception->getMessage(),
                 'code' => $exception->getCode()
             ], $exception->getCode()));
         }
