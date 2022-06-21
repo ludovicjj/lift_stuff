@@ -53,7 +53,7 @@ form[name="lift_form"] .row .col:last-child {
 /********* table rep *********/
 .card-reps .card-content .table-responsive {
     height: fit-content;
-    max-height:230px;
+    max-height: 295px;
 }
 .card-reps .card-content table {
     border-collapse: separate;
@@ -76,8 +76,6 @@ form[name="lift_form"] .row .col:last-child {
 .card-reps .card-content table td {
     background-color: #f7f7f7;
     color: gray;
-    padding-top: 10px;
-    padding-bottom: 10px;
 }
 .card-reps .card-content table td:first-child {
     border-top-left-radius: 10px;
@@ -145,6 +143,10 @@ form[name="lift_form"] .row .col:last-child {
 }
 .accordion-btn i {
     transition: transform .3s;
+}
+.accordion-btn:hover {
+    background-color: var(--blue-hover-color);
+    border: 1px var(--blue-hover-color) solid;
 }
 .accordion-btn.active {
     border-radius: .375rem .375rem 0 0;
