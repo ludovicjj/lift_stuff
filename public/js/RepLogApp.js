@@ -41,7 +41,7 @@ class RepLogApp {
                         row.remove();
                         this.updateTotalWeightLifted();
                         this.updateTotalReps();
-                        console.log(tableContainer.scrollHeight);
+
                         if (tableContainer.scrollHeight <= 295) {
                             tableContainer.style.overflowY = "visible";
                             tableContainer.style.paddingRight = `${0}px`;
@@ -60,7 +60,6 @@ class RepLogApp {
     }
 
     handleRowClick() {
-        console.log('Row clicked')
     }
 
     updateTotalWeightLifted () {
