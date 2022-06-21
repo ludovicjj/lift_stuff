@@ -39,8 +39,10 @@ class RepLogApp {
                     row.classList.add('hide');
                     setTimeout(() => {
                         row.remove();
-                        this.updateTotalWeightLifted()
-                        if (tableContainer.scrollHeight <= 230) {
+                        this.updateTotalWeightLifted();
+                        this.updateTotalReps();
+                        console.log(tableContainer.scrollHeight);
+                        if (tableContainer.scrollHeight <= 295) {
                             tableContainer.style.overflowY = "visible";
                             tableContainer.style.paddingRight = `${0}px`;
                         }
@@ -68,6 +70,15 @@ class RepLogApp {
         })
 
         this.wrapper.querySelector('.js-total-weight').textContent = totalWeight.toString();
+    }
+
+    updateTotalReps()
+    {
+        let totalReps = 0;
+        this.wrapper.querySelectorAll('tbody tr').forEach(function (row) {
+            totalReps += parseInt(row.getAttribute('data-reps'));
+        })
+        this.wrapper.querySelector('.js-total-reps').textContent = totalReps.toString();
     }
 
     /**
