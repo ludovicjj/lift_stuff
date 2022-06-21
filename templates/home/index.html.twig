@@ -1,7 +1,14 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
+    {{ parent() }}
     <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/home.js') }}" defer></script>
+    <script src="{{ asset('js/RepLogApp.js') }}" defer></script>
 {% endblock %}
 
 {% block body %}
@@ -19,7 +26,7 @@
                         </div>
                         <div class="col-md-9 card-content">
                             <div class="table-responsive mb-3">
-                                <table class="table table-hover">
+                                <table class="table table-hover js-rep-log-table">
                                     <thead>
                                     <tr>
                                         <th>What</th>
@@ -30,11 +37,15 @@
                                     </thead>
                                     <tbody>
                                     {% for repLog in repLogs %}
-                                        <tr>
+                                        <tr data-weight="{{ repLog.totalWeightLifted }}" data-reps="{{ repLog.reps }}">
                                             <td>{{ repLog.itemLabel|replace({'liftable_thing.': "", "_": " "})|title }}</td>
                                             <td>{{ repLog.reps }}</td>
                                             <td>{{ repLog.totalWeightLifted }}</td>
-                                            <td>&nbsp;</td>
+                                            <td>
+                                                <a class="btn btn-blue btn-sm js-delete-rep-log" role="button" data-url="{{ path('rep_log_delete', {id: repLog.id}) }}">
+                                                    <i class="fa-solid fa-ban"></i>
+                                                </a>
+                                            </td>
                                         </tr>
                                     {% else %}
                                         <tr>
@@ -45,8 +56,8 @@
                                     <tfoot>
                                         <tr>
                                             <td class="fw-bold">Total</td>
-                                            <td class="fw-bold">{{ totalReps }}</td>
-                                            <td class="fw-bold">{{ totalWeight }}</td>
+                                            <td class="fw-bold js-total-reps">{{ totalReps }}</td>
+                                            <td class="fw-bold js-total-weight">{{ totalWeight }}</td>
                                             <td>&nbsp;</td>
                                         </tr>
                                     </tfoot>
@@ -80,8 +91,4 @@
     </div>
 
     {{ include('components/modal_items.html.twig') }}
-{% endblock %}
-
-{% block javascripts %}
-    <script src="{{ asset('js/home.js') }}"></script>
 {% endblock %}
