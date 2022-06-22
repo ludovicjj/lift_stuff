@@ -21,7 +21,7 @@ class HomeTest extends PantherTestCase
 
         $this->loginPantherClient($client);
         $crawler = $client->request('GET', '/');
-        $this->assertSelectorTextContains('h2', 'Your Lift History');
+        $this->assertSelectorTextContains('.card-reps h2', 'Your Lift History');
 
         $this->assertEquals(5, $crawler->filter('.js-rep-log-table tbody tr')->count());
         $deleteLink = $crawler->filter('.js-delete-rep-log')->first();
