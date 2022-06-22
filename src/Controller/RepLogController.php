@@ -32,4 +32,14 @@ class RepLogController extends AbstractController
 
         return new JsonResponse(['message' => 'Request header X-Requested-With is missing'], Response::HTTP_BAD_REQUEST);
     }
+
+    #[Route("/reps", name: "add", methods: ['POST'])]
+    public function addRepLog(Request $request): void
+    {
+        // json from JS
+        $json = $request->getContent();
+        $data = json_decode($json, true);
+
+        dd($data);
+    }
 }
