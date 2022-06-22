@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\RepLogRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: RepLogRepository::class)]
 class RepLog
@@ -16,8 +17,6 @@ class RepLog
         'fat_cat' => '18'
     ];
 
-    const ITEM_LABEL_PREFIX = "liftable_thing.";
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
@@ -28,10 +27,12 @@ class RepLog
         Assert\NotBlank(message: "how many times did you lift this ?"),
         Assert\GreaterThan(value: 0, message: "You can certainly lift more than just 0 !")
     ]
+    #[Groups(['add_rep_log'])]
     private int $reps;
 
     #[ORM\Column(name: "item", type: "string", length: 50)]
     #[Assert\NotBlank(message: "What did you lift ?")]
+    #[Groups(['add_rep_log'])]
     private string $item;
 
     #[ORM\Column(name: "totalWeightLifted", type: "float")]
@@ -40,6 +41,13 @@ class RepLog
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
     private User $user;
+
+    public function __construct(int $reps, string $item)
+    {
+        $this->reps = $reps;
+        $this->item = $item;
+        $this->calculateTotalLifted();
+    }
 
     public function getId(): ?int
     {
@@ -71,11 +79,6 @@ class RepLog
     public function getItem(): string
     {
         return $this->item;
-    }
-
-    public function getItemLabel(): string
-    {
-        return self::ITEM_LABEL_PREFIX.$this->getItem();
     }
 
     public static function getLiftedItemChoices(): array
