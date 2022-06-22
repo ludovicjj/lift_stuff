@@ -46,14 +46,14 @@ class RepLogApp {
         this.toggleDisabledButton(deleteBtn);
         this.toggleMotionToIcon(deleteBtn.querySelector('.fa-ban'), 'fa-spin');
 
-        const init = {
+        const options = {
             method: "DELETE",
             headers: {
                 "X-Requested-With": "XMLHttpRequest"
             }
         }
 
-        fetch(deleteUrl, init)
+        fetch(deleteUrl, options)
             .then(async response => {
                 const isJson = response.headers.get('content-type')?.includes('application/json');
                 const data = isJson ? await response.json() : null;
