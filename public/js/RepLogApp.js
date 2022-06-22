@@ -36,7 +36,7 @@ class RepLogApp {
             .catch()
     }
 
-    async handleRepLogDelete(e) {
+    handleRepLogDelete(e) {
         e.preventDefault();
         const deleteBtn = e.currentTarget;
         const deleteUrl = deleteBtn.getAttribute('data-url');
@@ -64,7 +64,6 @@ class RepLogApp {
                         row.remove();
                         this.updateTotalWeightLifted();
                         this.updateTotalReps();
-                        console.log(tableContainer.scrollHeight);
                         if (tableContainer.scrollHeight <= 276) {
                             tableContainer.style.overflowY = "visible";
                             tableContainer.style.paddingRight = `${0}px`;
