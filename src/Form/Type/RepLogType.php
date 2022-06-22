@@ -34,6 +34,6 @@ class RepLogType extends AbstractType
     // Change form attr name
     public function getBlockPrefix(): string
     {
-        return 'lift_form';
+        return '';
     }
 }
