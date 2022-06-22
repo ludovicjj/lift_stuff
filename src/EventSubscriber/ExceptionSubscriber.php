@@ -2,14 +2,14 @@
 
 namespace App\EventSubscriber;
 
-use App\Security\RepLogVoter;
+use App\Exception\TokenCsrfException;
+use App\Exception\AccessDeniedException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-class RepLogSubscriber implements EventSubscriberInterface
+class ExceptionSubscriber implements EventSubscriberInterface
 {
 
     public static function getSubscribedEvents(): array
@@ -22,19 +22,21 @@ class RepLogSubscriber implements EventSubscriberInterface
     public function onKernelException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
-        if (!$exception instanceof AccessDeniedException) {
-            return;
+        switch (get_class($exception)) {
+            case TokenCsrfException::class:
+                $this->jsonResponseException($event);
+                break;
+            case AccessDeniedException::class:
+                $this->jsonResponseException($event);
         }
+    }
 
-        // Customize your response object to display the exception details
-        if (
-            $event->getRequest()->isXmlHttpRequest() &&
-            in_array(RepLogVoter::DELETE, $exception->getAttributes())
-        ) {
-            $event->setResponse(new JsonResponse([
-                'message' => $exception->getMessage(),
-                'code' => $exception->getCode()
-            ], $exception->getCode()));
-        }
+    public function jsonResponseException(ExceptionEvent $event)
+    {
+        $exception = $event->getThrowable();
+        $event->setResponse(new JsonResponse([
+            'message'   => $exception->getMessage(),
+            'code'      => $exception->getCode()
+        ], $event->getThrowable()->getCode()));
     }
 }
