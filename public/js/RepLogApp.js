@@ -1,6 +1,6 @@
 class RepLogApp {
     /**
-     * @param {HTMLElement} wrapper element table
+     * @param {HTMLElement} wrapper Div element contains table and form
      */
     constructor(wrapper) {
         this.wrapper = wrapper;
@@ -18,7 +18,7 @@ class RepLogApp {
         const deleteBtn = e.currentTarget;
         const deleteUrl = deleteBtn.getAttribute('data-url');
         const row = deleteBtn.closest('tr');
-        const tableContainer = this.wrapper.closest('.table-responsive');
+        const tableContainer = this.wrapper.querySelector('.table-responsive');
 
         this.toggleDisabledButton(deleteBtn);
         this.toggleMotionToIcon(deleteBtn.querySelector('.fa-ban'), 'fa-spin');
