@@ -11,6 +11,29 @@ class RepLogApp {
         this.wrapper.querySelectorAll('tbody tr').forEach(link => {
             link.addEventListener('click', this.handleRowClick)
         })
+
+        this.wrapper.querySelector('.js-new-rep-log-form').addEventListener('submit', this.handleRepLogAdd.bind(this))
+    }
+
+    handleRepLogAdd(e)
+    {
+        e.preventDefault();
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+        const json = JSON.stringify(Object.fromEntries(formData));
+        const addUrl = form.getAttribute('action');
+
+        const options = {
+            method: 'POST',
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                'Content-Type': 'application/json'
+            },
+            body: json
+        };
+        fetch(addUrl, options)
+            .then()
+            .catch()
     }
 
     async handleRepLogDelete(e) {
@@ -41,8 +64,8 @@ class RepLogApp {
                         row.remove();
                         this.updateTotalWeightLifted();
                         this.updateTotalReps();
-
-                        if (tableContainer.scrollHeight <= 295) {
+                        console.log(tableContainer.scrollHeight);
+                        if (tableContainer.scrollHeight <= 276) {
                             tableContainer.style.overflowY = "visible";
                             tableContainer.style.paddingRight = `${0}px`;
                         }
