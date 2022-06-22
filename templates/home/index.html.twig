@@ -38,7 +38,7 @@
                                     <tbody>
                                     {% for repLog in repLogs %}
                                         <tr data-weight="{{ repLog.totalWeightLifted }}" data-reps="{{ repLog.reps }}">
-                                            <td>{{ repLog.itemLabel|replace({'liftable_thing.': "", "_": " "})|title }}</td>
+                                            <td>{{ repLog.item|replace({"_": " "})|title }}</td>
                                             <td>{{ repLog.reps }}</td>
                                             <td>{{ repLog.totalWeightLifted }}</td>
                                             <td>
