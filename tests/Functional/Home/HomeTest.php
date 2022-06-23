@@ -70,6 +70,39 @@ class HomeTest extends PantherTestCase
         );
     }
 
+    public function testDeleteRepLogNotExist(): void
+    {
+        $client = static::createPantherClient(
+            [],
+            [],
+            [
+                'capabilities' => [
+                    'goog:loggingPrefs' => [
+                        'browser' => 'ALL'
+                    ],
+                ]
+            ]
+        );
+        $this->loadFixtures();
+        $this->loginPantherClient($client);
+        $crawler = $client->request('GET', '/');
+
+        $client->executeScript("document.querySelector('.js-delete-rep-log').setAttribute('data-url', '/api/reps/752')");
+
+        $deleteLink = $crawler->filter('.js-delete-rep-log')->first();
+        $deleteLink->click();
+        sleep(1);
+        $this->assertEquals(5, $crawler->filter('.js-rep-log-table tbody tr')->count());
+
+
+        $logs = $client->getWebDriver()->manage()->getLog('browser');
+        $this->assertCount(2, $logs);
+        $this->assertSame(
+            "Failed to load resource: the server responded with a status of 404 (Not Found)",
+            substr(strstr($logs[0]['message'], '-'), 2)
+        );
+    }
+
     private function loginPantherClient(Client $client): void
     {
         $crawler = $client->request('GET', '/login');
