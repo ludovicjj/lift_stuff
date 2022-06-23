@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber;
 
+use App\Exception\NotFoundException;
 use App\Exception\TokenCsrfException;
 use App\Exception\AccessDeniedException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -23,11 +24,11 @@ class ExceptionSubscriber implements EventSubscriberInterface
     {
         $exception = $event->getThrowable();
         switch (get_class($exception)) {
+            case AccessDeniedException::class:
             case TokenCsrfException::class:
+            case NotFoundException::class:
                 $this->jsonResponseException($event);
                 break;
-            case AccessDeniedException::class:
-                $this->jsonResponseException($event);
         }
     }
 

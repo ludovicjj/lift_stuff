@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Entity\RepLog;
 use App\Exception\AccessDeniedException;
+use App\Exception\NotFoundException;
 use App\Exception\TokenCsrfException;
+use App\Repository\RepLogRepository;
 use App\Security\RepLogVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -23,11 +25,16 @@ class RepLogController extends AbstractController
     }
 
     #[Route("/reps/{id}", name: "delete", methods: ['DELETE'])]
-    public function deleteRepLog(RepLog $repLog, Request $request): JsonResponse
+    public function deleteRepLog(RepLogRepository $repLogRepository, Request $request): JsonResponse
     {
         $this->denyAccessUnlessGranted('ROLE_USER');
 
         if($request->isXmlHttpRequest()) {
+            $repLog = $repLogRepository->find($request->attributes->get('id'));
+            if(!$repLog) {
+                throw new NotFoundException("Not found.");
+            }
+
             if (!$this->isGranted(RepLogVoter::DELETE, $repLog)) {
                 throw new AccessDeniedException("You are not allow to delete this RepLog");
             }
