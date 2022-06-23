@@ -5,6 +5,7 @@ namespace App\EventSubscriber;
 use App\Exception\NotFoundException;
 use App\Exception\TokenCsrfException;
 use App\Exception\AccessDeniedException;
+use App\Exception\ValidationException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
@@ -29,15 +30,28 @@ class ExceptionSubscriber implements EventSubscriberInterface
             case NotFoundException::class:
                 $this->jsonResponseException($event);
                 break;
+            case ValidationException::class:
+                $this->processValidatorException($event);
         }
     }
 
-    public function jsonResponseException(ExceptionEvent $event)
+    public function jsonResponseException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
         $event->setResponse(new JsonResponse([
             'message'   => $exception->getMessage(),
             'code'      => $exception->getCode()
-        ], $event->getThrowable()->getCode()));
+        ], $exception->getCode()));
+    }
+
+    public function processValidatorException(ExceptionEvent $event): void
+    {
+        /** @var ValidationException $exception */
+        $exception = $event->getThrowable();
+        $event->setResponse(new JsonResponse([
+            'message'   => $exception->getMessage(),
+            'errors'    => $exception->getErrors(),
+            'code'      => $exception->getCode()
+        ], $exception->getCode()));
     }
 }

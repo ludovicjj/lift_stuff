@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Functional\Home;
+namespace App\Tests\Functional\Replog;
 
 use App\Entity\RepLog;
 use App\Factory\RepLogFactory;
@@ -10,7 +10,7 @@ use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 use Symfony\Component\Panther\Client;
 
-class HomeTest extends PantherTestCase
+class DeleteRepLogTest extends PantherTestCase
 {
     use ResetDatabase, Factories;
 

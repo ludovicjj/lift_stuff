@@ -3,11 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\RepLog;
+use App\Entity\User;
 use App\Exception\AccessDeniedException;
 use App\Exception\NotFoundException;
 use App\Exception\TokenCsrfException;
 use App\Repository\RepLogRepository;
 use App\Security\RepLogVoter;
+use App\Service\ErrorValidationFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -57,14 +59,21 @@ class RepLogController extends AbstractController
             throw new TokenCsrfException('Invalid CSRF token.');
         }
 
+        /** @var User $user */
+        $user = $this->getUser();
+        if(!$user) {
+            throw new AccessDeniedException('Access denied.');
+        }
+
         /** @var RepLog $repLog */
         $repLog = $serializer->deserialize($request->getContent(), RepLog::class, 'json', ['groups' => 'add_rep_log']);
-        /** TODO handle validation violation */
-        $contraintList = $validator->validate($repLog);
+        $repLog->setUser($user);
 
-        /** TODO send JSON with violation contraints */
-        /** TODO set user with authenticated user */
-        /** TODO persist and flush repLog */
+        $contraintList = $validator->validate($repLog);
+        ErrorValidationFactory::buildError($contraintList);
+
+        $this->entityManager->persist($repLog);
+        $this->entityManager->flush();
 
         return new JsonResponse(
             [
