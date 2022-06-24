@@ -1,18 +1,15 @@
 <?php
 
-namespace App\Tests\Functional\Replog;
+namespace App\Tests\Functional\RepLog;
 
-use App\Entity\RepLog;
-use App\Factory\RepLogFactory;
-use App\Factory\UserFactory;
+use App\Tests\FunctionalTestTrait;
 use Symfony\Component\Panther\PantherTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
-use Symfony\Component\Panther\Client;
 
 class DeleteRepLogTest extends PantherTestCase
 {
-    use ResetDatabase, Factories;
+    use ResetDatabase, Factories, FunctionalTestTrait;
 
     public function testDeleteOneRep(): void
     {
@@ -97,34 +94,10 @@ class DeleteRepLogTest extends PantherTestCase
 
         $logs = $client->getWebDriver()->manage()->getLog('browser');
         $this->assertCount(2, $logs);
-        $this->assertSame(
+
+        $this->assertStringContainsString(
             "Failed to load resource: the server responded with a status of 404 (Not Found)",
-            substr(strstr($logs[0]['message'], '-'), 2)
+            $logs[0]['message']
         );
-    }
-
-    private function loginPantherClient(Client $client): void
-    {
-        $crawler = $client->request('GET', '/login');
-        $form = $crawler->filter('form[name=login]')->form([
-            '_email' => 'test@example.com',
-            '_password' => "password"
-        ]);
-        $client->submit($form);
-    }
-
-    private function loadFixtures(): void
-    {
-        $items = array_flip(RepLog::getAllowedLiftItems());
-
-        $user = UserFactory::createOne([
-            'email' => 'test@example.com',
-            'password' => 'password'
-        ]);
-        RepLogFactory::new(['user' => $user])
-            ->withItem($items)
-            ->many(5)
-            ->create()
-        ;
     }
 }

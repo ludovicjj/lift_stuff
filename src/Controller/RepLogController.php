@@ -8,6 +8,7 @@ use App\Exception\AccessDeniedException;
 use App\Exception\NotFoundException;
 use App\Exception\TokenCsrfException;
 use App\Repository\RepLogRepository;
+use App\Repository\UserRepository;
 use App\Security\RepLogVoter;
 use App\Service\ErrorValidationFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -53,6 +54,7 @@ class RepLogController extends AbstractController
         Request $request,
         SerializerInterface $serializer,
         ValidatorInterface $validator,
+        UserRepository $userRepository
     ): Response
     {
         if (!$this->isCsrfTokenValid('add_rep_log_item', $request->toArray()['_token'] ?? null)) {
@@ -76,12 +78,10 @@ class RepLogController extends AbstractController
         $this->entityManager->flush();
 
         return new JsonResponse(
-            [
-                'item'      => $repLog->getItem(),
-                'reps'      => $repLog->getReps(),
-                'weight'    => $repLog->getTotalWeightLifted()
-            ],
-            Response::HTTP_CREATED
+            $serializer->serialize($repLog,'json', ['groups' => "read_rep_log"]),
+            Response::HTTP_CREATED,
+            [],
+            true
         );
     }
 }

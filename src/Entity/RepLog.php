@@ -20,6 +20,7 @@ class RepLog
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['read_rep_log'])]
     private int $id;
 
     /** @var int|null $reps */
@@ -28,7 +29,7 @@ class RepLog
         Assert\NotBlank(message: "how many times did you lift this ?"),
         Assert\GreaterThan(value: 0, message: "You can certainly lift more than just 0 !")
     ]
-    #[Groups(['add_rep_log'])]
+    #[Groups(['add_rep_log', 'read_rep_log'])]
     private ?int $reps = null;
 
     /** @var string|null $item */
@@ -37,10 +38,11 @@ class RepLog
         Assert\NotBlank(message: "What did you lift ?"),
         Assert\Choice(callback: "getAllowedLiftItems")
     ]
-    #[Groups(['add_rep_log'])]
+    #[Groups(['add_rep_log', 'read_rep_log'])]
     private ?string $item = null;
 
     #[ORM\Column(name: "totalWeightLifted", type: "float")]
+    #[Groups(['add_rep_log', 'read_rep_log'])]
     private ?float $totalWeightLifted;
 
     #[ORM\ManyToOne(targetEntity: User::class)]

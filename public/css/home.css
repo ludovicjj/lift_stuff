@@ -166,6 +166,9 @@ form.js-new-rep-log-form .row .col:last-child {
     display: flex;
     justify-content: space-between;
 }
+.accordion-btn:focus {
+    box-shadow: none;
+}
 .accordion-custom.show .accordion-btn{
     border-radius: .375rem .375rem 0 0;
 }

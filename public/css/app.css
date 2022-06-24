@@ -5,6 +5,7 @@
     --white-color: #fff;
     --blue-color: #2A265F;
     --blue-hover-color: #7271bb;
+    --blue-hover-rbga-color: rgba(114, 113, 187, .25);
     --scroll-bar-color: #f1f1f1;
     --grey-color: #808080FF;
     --grey-light-color: #f7f7f7;
@@ -62,6 +63,15 @@ main {
     background-color: var(--blue-hover-color);
     border: 1px solid var(--blue-hover-color);
     color: var(--white-color);
+}
+.btn-blue[type="submit"]:active, .btn-blue[type="submit"]:focus {
+    background-color: var(--blue-color);
+    border: 1px solid var(--blue-color);
+    color: var(--white-color);
+}
+
+.btn-blue:focus {
+    box-shadow: 0 0 0 .25rem var(--blue-hover-rbga-color);
 }
 
 /* SCROLL BAR */
