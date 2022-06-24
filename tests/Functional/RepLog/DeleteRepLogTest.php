@@ -1,18 +1,15 @@
 <?php
 
-namespace App\Tests\Functional\Home;
+namespace App\Tests\Functional\RepLog;
 
-use App\Entity\RepLog;
-use App\Factory\RepLogFactory;
-use App\Factory\UserFactory;
+use App\Tests\FunctionalTestTrait;
 use Symfony\Component\Panther\PantherTestCase;
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
-use Symfony\Component\Panther\Client;
 
-class HomeTest extends PantherTestCase
+class DeleteRepLogTest extends PantherTestCase
 {
-    use ResetDatabase, Factories;
+    use ResetDatabase, Factories, FunctionalTestTrait;
 
     public function testDeleteOneRep(): void
     {
@@ -21,7 +18,7 @@ class HomeTest extends PantherTestCase
 
         $this->loginPantherClient($client);
         $crawler = $client->request('GET', '/');
-        $this->assertSelectorTextContains('h2', 'Your Lift History');
+        $this->assertSelectorTextContains('.card-reps h2', 'Your Lift History');
 
         $this->assertEquals(5, $crawler->filter('.js-rep-log-table tbody tr')->count());
         $deleteLink = $crawler->filter('.js-delete-rep-log')->first();
@@ -70,28 +67,37 @@ class HomeTest extends PantherTestCase
         );
     }
 
-    private function loginPantherClient(Client $client): void
+    public function testDeleteRepLogNotExist(): void
     {
-        $crawler = $client->request('GET', '/login');
-        $form = $crawler->filter('form[name=login]')->form([
-            '_email' => 'test@example.com',
-            '_password' => "password"
-        ]);
-        $client->submit($form);
-    }
+        $client = static::createPantherClient(
+            [],
+            [],
+            [
+                'capabilities' => [
+                    'goog:loggingPrefs' => [
+                        'browser' => 'ALL'
+                    ],
+                ]
+            ]
+        );
+        $this->loadFixtures();
+        $this->loginPantherClient($client);
+        $crawler = $client->request('GET', '/');
 
-    private function loadFixtures(): void
-    {
-        $items = array_flip(RepLog::getAllowedLiftItems());
+        $client->executeScript("document.querySelector('.js-delete-rep-log').setAttribute('data-url', '/api/reps/752')");
 
-        $user = UserFactory::createOne([
-            'email' => 'test@example.com',
-            'password' => 'password'
-        ]);
-        RepLogFactory::new(['user' => $user])
-            ->withItem($items)
-            ->many(5)
-            ->create()
-        ;
+        $deleteLink = $crawler->filter('.js-delete-rep-log')->first();
+        $deleteLink->click();
+        sleep(1);
+        $this->assertEquals(5, $crawler->filter('.js-rep-log-table tbody tr')->count());
+
+
+        $logs = $client->getWebDriver()->manage()->getLog('browser');
+        $this->assertCount(2, $logs);
+
+        $this->assertStringContainsString(
+            "Failed to load resource: the server responded with a status of 404 (Not Found)",
+            $logs[0]['message']
+        );
     }
 }

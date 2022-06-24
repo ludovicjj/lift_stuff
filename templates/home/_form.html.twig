@@ -1,6 +1,8 @@
 {{ form_start(formLift, {
     'attr': {
         'novalidate': 'novalidate',
+        'class': 'js-new-rep-log-form',
+        'action': path('rep_log_add')
     }
 }) }}
     {{ form_errors(formLift) }}

@@ -24,9 +24,9 @@
                             </div>
                             <a href="#" id="item-info">View items info <i class="fa-solid fa-chevron-right"></i></a>
                         </div>
-                        <div class="col-md-9 card-content">
+                        <div class="col-md-9 card-content js-rep-log-table">
                             <div class="table-responsive mb-3">
-                                <table class="table table-hover js-rep-log-table">
+                                <table class="table table-hover">
                                     <thead>
                                     <tr>
                                         <th>What</th>
@@ -38,7 +38,7 @@
                                     <tbody>
                                     {% for repLog in repLogs %}
                                         <tr data-weight="{{ repLog.totalWeightLifted }}" data-reps="{{ repLog.reps }}">
-                                            <td>{{ repLog.itemLabel|replace({'liftable_thing.': "", "_": " "})|title }}</td>
+                                            <td>{{ repLog.item|replace({"_": " "})|title }}</td>
                                             <td>{{ repLog.reps }}</td>
                                             <td>{{ repLog.totalWeightLifted }}</td>
                                             <td>

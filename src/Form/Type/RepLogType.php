@@ -27,13 +27,15 @@ class RepLogType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => RepLog::class,
+            'data_class'        => RepLog::class,
+            'csrf_protection'   => true,
+            'csrf_token_id'     => 'add_rep_log_item',
         ]);
     }
 
     // Change form attr name
     public function getBlockPrefix(): string
     {
-        return 'lift_form';
+        return '';
     }
 }

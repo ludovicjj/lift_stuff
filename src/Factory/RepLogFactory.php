@@ -55,7 +55,7 @@ final class RepLogFactory extends ModelFactory
     public function withItem(array $items = []): self
     {
         return $this->addState(function () use($items) {
-           return ['item' => !empty($items) ? array_rand($items) : 'chat'];
+           return ['item' => !empty($items) ? array_rand($items) : 'cat'];
         });
     }
 

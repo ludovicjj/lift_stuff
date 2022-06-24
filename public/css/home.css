@@ -1,12 +1,12 @@
-form[name="lift_form"] .row {
+form.js-new-rep-log-form .row {
     flex-wrap: wrap;
     gap: 1rem;
 }
-form[name="lift_form"] .row >.col {
+form.js-new-rep-log-form .row >.col {
     flex: 1 1 auto;
 }
 
-form[name="lift_form"] .row .col:last-child {
+form.js-new-rep-log-form .row .col:last-child {
     max-width: fit-content;
 }
 /* fix btn delete rep before load icon */
@@ -51,21 +51,57 @@ form[name="lift_form"] .row .col:last-child {
     margin-top: 30px;
 }
 /********* table rep *********/
-.card-reps .card-content .table-responsive {
-    height: fit-content;
-    max-height: 295px;
-}
 .card-reps .card-content table {
-    border-collapse: separate;
-    border-spacing: 0 10px;
-    margin: -10px 0 0 0;
+    margin-bottom: 0;
 }
-.card-reps tbody::after
+.card-reps .card-content table tbody {
+    display: flex;
+    flex-flow: column nowrap;
+}
+.card-reps .card-content table tr{
+    display: flex;
+}
+.card-reps .card-content table td {
+ color: var(--grey-color);
+}
+.card-reps .card-content table tbody tr {
+    margin-bottom: 10px;
+}
+.card-reps .card-content table tbody tr:first-child {
+    margin-top: 10px;
+}
+.card-reps .card-content table tbody tr:last-child {
+    margin-bottom: 20px;
+}
+.card-reps .card-content table thead tr th,
+.card-reps .card-content table tbody tr td,
+.card-reps .card-content table tfoot tr td
 {
-    content: '';
-    display: block;
-    height: 5px;
+    flex: 1 1 25%;
+    background-color: var(--grey-light-color);
 }
+.card-reps .card-content table tbody tr td:last-child,
+.card-reps .card-content table tfoot tr td:last-child,
+.card-reps .card-content table thead tr th:last-child
+{
+    max-width: 50px
+}
+.card-reps .card-content table thead tr th {
+    background-color: white;
+}
+.card-reps .card-content table tbody td:first-child,
+.card-reps .card-content table tfoot td:first-child
+{
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+.card-reps .card-content table tbody td:last-child,
+.card-reps .card-content table tfoot td:last-child
+{
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+/* for js animation */
 .card-reps table tbody tr {
     opacity: 1;
     transition: opacity .5s;
@@ -73,17 +109,9 @@ form[name="lift_form"] .row .col:last-child {
 .card-reps table tbody tr.hide {
     opacity: 0;
 }
-.card-reps .card-content table td {
-    background-color: #f7f7f7;
-    color: gray;
-}
-.card-reps .card-content table td:first-child {
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
-}
-.card-reps .card-content table td:last-child {
-    border-top-right-radius: 10px;
-    border-bottom-right-radius: 10px;
+/* overflowY over 276px */
+.card-reps .card-content .table-responsive {
+    max-height: 276px;
 }
 
 /******* Modal Items Info *********/
@@ -138,6 +166,9 @@ form[name="lift_form"] .row .col:last-child {
     display: flex;
     justify-content: space-between;
 }
+.accordion-btn:focus {
+    box-shadow: none;
+}
 .accordion-custom.show .accordion-btn{
     border-radius: .375rem .375rem 0 0;
 }
@@ -174,7 +205,7 @@ form[name="lift_form"] .row .col:last-child {
 
 /* style for screen >= 576px */
 @media (min-width: 576px) {
-    form[name="lift_form"] .row {
+    form.js-new-rep-log-form .row {
         flex-wrap: nowrap;
         gap: 0;
     }

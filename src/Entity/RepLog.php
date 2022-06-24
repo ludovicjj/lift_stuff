@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\RepLogRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: RepLogRepository::class)]
 class RepLog
@@ -16,30 +17,45 @@ class RepLog
         'fat_cat' => '18'
     ];
 
-    const ITEM_LABEL_PREFIX = "liftable_thing.";
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['read_rep_log'])]
     private int $id;
 
+    /** @var int|null $reps */
     #[ORM\Column(name: 'reps', type: 'integer')]
     #[
         Assert\NotBlank(message: "how many times did you lift this ?"),
         Assert\GreaterThan(value: 0, message: "You can certainly lift more than just 0 !")
     ]
-    private int $reps;
+    #[Groups(['add_rep_log', 'read_rep_log'])]
+    private ?int $reps = null;
 
+    /** @var string|null $item */
     #[ORM\Column(name: "item", type: "string", length: 50)]
-    #[Assert\NotBlank(message: "What did you lift ?")]
-    private string $item;
+    #[
+        Assert\NotBlank(message: "What did you lift ?"),
+        Assert\Choice(callback: "getAllowedLiftItems")
+    ]
+    #[Groups(['add_rep_log', 'read_rep_log'])]
+    private ?string $item = null;
 
     #[ORM\Column(name: "totalWeightLifted", type: "float")]
-    private float $totalWeightLifted;
+    #[Groups(['add_rep_log', 'read_rep_log'])]
+    private ?float $totalWeightLifted;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
     private User $user;
+
+
+    public function __construct(?string $item, ?int $reps)
+    {
+        $this->item = $item;
+        $this->reps = $reps;
+        $this->calculateTotalLifted();
+    }
 
     public function getId(): ?int
     {
@@ -52,32 +68,23 @@ class RepLog
         return $this;
     }
 
-    public function getReps(): int
+    public function getReps(): ?int
     {
         return $this->reps;
     }
 
-    public function setItem($item): self
+    public function setItem(string $item): self
     {
-        if (!array_key_exists($item, self::ALLOWED_LIFT_ITEMS)) {
-            throw new \InvalidArgumentException(sprintf('Oops, vous ne pouvez pas levez "%s" !', $item));
-        }
-
         $this->item = $item;
-        $this->calculateTotalLifted();
         return $this;
     }
 
-    public function getItem(): string
+    public function getItem(): ?string
     {
         return $this->item;
     }
 
-    public function getItemLabel(): string
-    {
-        return self::ITEM_LABEL_PREFIX.$this->getItem();
-    }
-
+    /** Used for choice value into RepLopType  */
     public static function getLiftedItemChoices(): array
     {
         $items = array_keys(self::ALLOWED_LIFT_ITEMS);
@@ -88,7 +95,7 @@ class RepLog
         return $choices;
     }
 
-    public function getTotalWeightLifted(): float
+    public function getTotalWeightLifted(): ?float
     {
         return $this->totalWeightLifted;
     }
@@ -105,9 +112,15 @@ class RepLog
         return $this;
     }
 
-    private function calculateTotalLifted()
+    private function calculateTotalLifted(): void
     {
-        if (!$this->getItem()) {
+        if (!$this->getItem() || !$this->getReps()) {
+            $this->totalWeightLifted = null;
+            return;
+        }
+
+        if (!array_key_exists($this->getItem(), self::ALLOWED_LIFT_ITEMS)) {
+            $this->totalWeightLifted = null;
             return;
         }
 
