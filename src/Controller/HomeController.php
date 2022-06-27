@@ -29,20 +29,6 @@ class HomeController extends AbstractController
         $form = $this->createForm(RepLogType::class);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            /** @var RepLog $repLog */
-            $repLog = $form->getData();
-            /** @var User $user */
-            $user = $this->getUser();
-
-            $repLog->setUser($user);
-            $this->entityManager->persist($repLog);
-            $this->entityManager->flush();
-            $this->addFlash('notice', "Lift with success !");
-
-            return $this->redirectToRoute("home");
-        }
-
         $repLogs = $this->repLogRepository->findBy([
             'user' => $this->getUser()
         ]);
