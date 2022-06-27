@@ -49,7 +49,6 @@ class RepLogApp {
 
                 if (response.ok) {
                     const {reps, totalWeightLifted} = data;
-                    console.log(data);
                     // Build <tr>
                     const tr = this.createElement('tr')
                     tr.setAttribute('data-weight', totalWeightLifted);
