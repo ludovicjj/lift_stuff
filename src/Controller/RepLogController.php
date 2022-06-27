@@ -8,7 +8,6 @@ use App\Exception\AccessDeniedException;
 use App\Exception\NotFoundException;
 use App\Exception\TokenCsrfException;
 use App\Repository\RepLogRepository;
-use App\Repository\UserRepository;
 use App\Security\RepLogVoter;
 use App\Service\ErrorValidationFactory;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,6 +15,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -53,10 +53,14 @@ class RepLogController extends AbstractController
     public function addRepLog(
         Request $request,
         SerializerInterface $serializer,
-        ValidatorInterface $validator,
-        UserRepository $userRepository
+        ValidatorInterface $validator
     ): Response
     {
+        $data = json_decode($request->getContent(), true);
+        if ($data === null) {
+            throw new BadRequestHttpException('Invalid JSON.');
+        }
+
         if (!$this->isCsrfTokenValid('add_rep_log_item', $request->toArray()['_token'] ?? null)) {
             throw new TokenCsrfException('Invalid CSRF token.');
         }
