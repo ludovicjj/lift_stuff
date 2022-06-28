@@ -60,24 +60,24 @@ class RepLogController extends BaseController
     ): Response
     {
         if ($request->isXmlHttpRequest()) {
-            //$this->denyAccessUnlessGranted('ROLE_USER');
+            $this->denyAccessUnlessGranted('ROLE_USER');
 
-//            if (!$this->isCsrfTokenValid('add_rep_log_item', $request->toArray()['_token'] ?? null)) {
-//                throw new InvalidCsrfTokenException('Invalid CSRF token.');
-//            }
+            if (!$this->isCsrfTokenValid('add_rep_log_item', $request->toArray()['_token'] ?? null)) {
+                throw new InvalidCsrfTokenException('Invalid CSRF token.');
+            }
 
             /** @var RepLog $repLog */
             $repLog = $serializer->deserialize($request->getContent(), RepLog::class, 'json', ['groups' => 'add_rep_log']);
-//            /** @var User $user */
-//            $user = $this->getUser();
-//            $repLog->setUser($user);
+            /** @var User $user */
+            $user = $this->getUser();
+            $repLog->setUser($user);
 
             $contraintList = $validator->validate($repLog);
-            //ErrorValidationFactory::buildError($contraintList);
+            ErrorValidationFactory::buildError($contraintList);
 
             $this->entityManager->persist($repLog);
-            dd($repLog);
             $this->entityManager->flush();
+
             $apiModel = $this->createRepLogModel($repLog);
             return $this->createApiResponse($apiModel, 201);
         }
