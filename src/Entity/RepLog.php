@@ -20,7 +20,7 @@ class RepLog
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    private int $id;
+    private ?int $id = null;
 
     #[ORM\Column(name: 'reps', type: 'integer')]
     #[
@@ -28,7 +28,7 @@ class RepLog
         Assert\GreaterThan(value: 0, message: "You can certainly lift more than just 0 !")
     ]
     #[Groups(['add_rep_log'])]
-    private int $reps;
+    private ?int $reps = null;
 
     #[ORM\Column(name: "item", type: "string", length: 50)]
     #[
@@ -36,7 +36,7 @@ class RepLog
         Assert\Choice(callback: "getAllowedLiftItems")
     ]
     #[Groups(['add_rep_log'])]
-    private string $item;
+    private ?string $item = null;
 
     #[ORM\Column(name: "totalWeightLifted", type: "float")]
     private float $totalWeightLifted;
@@ -57,7 +57,7 @@ class RepLog
         return $this;
     }
 
-    public function getReps(): int
+    public function getReps(): ?int
     {
         return $this->reps;
     }
@@ -68,7 +68,7 @@ class RepLog
         return $this;
     }
 
-    public function getItem(): string
+    public function getItem(): ?string
     {
         return $this->item;
     }
