@@ -20,7 +20,6 @@ class RepLog
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['read_rep_log'])]
     private int $id;
 
     #[ORM\Column(name: 'reps', type: 'integer')]
@@ -28,20 +27,19 @@ class RepLog
         Assert\NotBlank(message: "how many times did you lift this ?"),
         Assert\GreaterThan(value: 0, message: "You can certainly lift more than just 0 !")
     ]
-    #[Groups(['add_rep_log', 'read_rep_log'])]
-    private ?int $reps = null;
+    #[Groups(['add_rep_log'])]
+    private int $reps;
 
     #[ORM\Column(name: "item", type: "string", length: 50)]
     #[
         Assert\NotBlank(message: "What did you lift ?"),
         Assert\Choice(callback: "getAllowedLiftItems")
     ]
-    #[Groups(['add_rep_log', 'read_rep_log'])]
-    private ?string $item = null;
+    #[Groups(['add_rep_log'])]
+    private string $item;
 
     #[ORM\Column(name: "totalWeightLifted", type: "float")]
-    #[Groups(['add_rep_log', 'read_rep_log'])]
-    private ?float $totalWeightLifted;
+    private float $totalWeightLifted;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
@@ -59,7 +57,7 @@ class RepLog
         return $this;
     }
 
-    public function getReps(): ?int
+    public function getReps(): int
     {
         return $this->reps;
     }
@@ -70,7 +68,7 @@ class RepLog
         return $this;
     }
 
-    public function getItem(): ?string
+    public function getItem(): string
     {
         return $this->item;
     }
@@ -86,13 +84,13 @@ class RepLog
         return $choices;
     }
 
-    public function getTotalWeightLifted(): ?float
+    public function getTotalWeightLifted(): float
     {
         return $this->totalWeightLifted;
     }
 
     // Set totalWeightLifted with RepLogListener (PrePersist)
-    public function setTotalWeightLifted(?float $total): self
+    public function setTotalWeightLifted(float $total): self
     {
         $this->totalWeightLifted = $total;
         return $this;
