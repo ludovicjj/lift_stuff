@@ -8,14 +8,14 @@ class RepLogListener
 {
     public function prePersist(RepLog $repLog)
     {
-        // Missing item or reps
-        if (!$repLog->getItem() || !$repLog->getReps()) {
-            return;
-        }
-
-        // Item input is not an allowed item
-        if (!array_key_exists($repLog->getItem(), RepLog::ALLOWED_LIFT_ITEMS)) {
-            return;
+        // Item or reps are null or item is not allowed
+        if (
+            !$repLog->getItem() ||
+            !$repLog->getReps() ||
+            !array_key_exists($repLog->getItem(), RepLog::ALLOWED_LIFT_ITEMS)
+        )
+        {
+            throw new \LogicException("Unable to set total weights lifted with the values given for item or reps");
         }
 
         // Get weight for the given item
