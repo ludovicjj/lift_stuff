@@ -69,17 +69,7 @@ class DeleteRepLogTest extends PantherTestCase
 
     public function testDeleteRepLogNotExist(): void
     {
-        $client = static::createPantherClient(
-            [],
-            [],
-            [
-                'capabilities' => [
-                    'goog:loggingPrefs' => [
-                        'browser' => 'ALL'
-                    ],
-                ]
-            ]
-        );
+        $client = static::createPantherClient();
         $this->loadFixtures();
         $this->loginPantherClient($client);
         $crawler = $client->request('GET', '/');
@@ -90,14 +80,5 @@ class DeleteRepLogTest extends PantherTestCase
         $deleteLink->click();
         sleep(1);
         $this->assertEquals(5, $crawler->filter('.js-rep-log-table tbody tr')->count());
-
-
-        $logs = $client->getWebDriver()->manage()->getLog('browser');
-        $this->assertCount(2, $logs);
-
-        $this->assertStringContainsString(
-            "Failed to load resource: the server responded with a status of 404 (Not Found)",
-            $logs[0]['message']
-        );
     }
 }

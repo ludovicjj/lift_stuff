@@ -118,10 +118,9 @@ class AddRepLogTest extends PantherTestCase
 
         $this->assertEquals(6, $crawler->filter('.js-rep-log-table tbody tr')->count());
         $row = $crawler->filter('.js-rep-log-table tbody tr')->last();
-        $this->assertEquals('cat', $row->filter('td')->getElement(0)->getText());
+        $this->assertEquals('Cat', $row->filter('td')->getElement(0)->getText());
         $this->assertEquals('5', $row->filter('td')->getElement(1)->getText());
         $this->assertEquals('45', $row->filter('td')->getElement(2)->getText());
-        $client->getWebDriver()->manage()->getLog('browser');
     }
 
 }
