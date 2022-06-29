@@ -73,6 +73,14 @@ class RepLog
         return $this->item;
     }
 
+    public function getItemLabel(): string
+    {
+        if (!$this->getItem()) {
+            throw new \LogicException('Item cannot be null');
+        }
+        return ucwords(str_replace('_', ' ', $this->getItem()));
+    }
+
     /** Used for choice value into RepLopType  */
     public static function getLiftedItemChoices(): array
     {
