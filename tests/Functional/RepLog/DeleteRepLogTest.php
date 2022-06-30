@@ -18,6 +18,7 @@ class DeleteRepLogTest extends PantherTestCase
 
         $this->loginPantherClient($client);
         $crawler = $client->request('GET', '/');
+        sleep(1);
         $this->assertSelectorTextContains('.card-reps h2', 'Your Lift History');
 
         $this->assertEquals(5, $crawler->filter('.js-rep-log-table tbody tr')->count());
@@ -36,6 +37,7 @@ class DeleteRepLogTest extends PantherTestCase
 
         $this->loginPantherClient($client);
         $crawler = $client->request('GET', '/');
+        sleep(1);
 
         $deleteLink = $crawler->filter('.js-delete-rep-log')->first();
         $rowWeight = $crawler->filter('.js-rep-log-table tbody tr')->first()->getAttribute('data-weight');
@@ -53,6 +55,7 @@ class DeleteRepLogTest extends PantherTestCase
         $this->loadFixtures();
         $this->loginPantherClient($client);
         $crawler = $client->request('GET', '/');
+        sleep(1);
 
         $deleteLink = $crawler->filter('.js-delete-rep-log')->first();
         $rowReps = $crawler->filter('.js-rep-log-table tbody tr')->first()->getAttribute('data-reps');
@@ -73,6 +76,7 @@ class DeleteRepLogTest extends PantherTestCase
         $this->loadFixtures();
         $this->loginPantherClient($client);
         $crawler = $client->request('GET', '/');
+        sleep(1);
 
         $client->executeScript("document.querySelector('.js-delete-rep-log').setAttribute('data-url', '/api/reps/752')");
 

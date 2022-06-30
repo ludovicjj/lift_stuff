@@ -96,7 +96,7 @@ main {
 }
 .table-responsive {
     padding-right: 5px;
-    overflow-y: scroll;
+    /*overflow-y: scroll;*/
     scrollbar-color: var(--blue-color) #c9c8c8;
     scrollbar-width: thin;
 }

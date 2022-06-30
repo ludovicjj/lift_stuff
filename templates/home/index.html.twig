@@ -36,28 +36,14 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    {% for repLog in repLogs %}
-                                        <tr data-weight="{{ repLog.totalWeightLifted }}" data-reps="{{ repLog.reps }}">
-                                            <td>{{ repLog.item|replace({"_": " "})|title }}</td>
-                                            <td>{{ repLog.reps }}</td>
-                                            <td>{{ repLog.totalWeightLifted }}</td>
-                                            <td>
-                                                <a class="btn btn-blue btn-sm js-delete-rep-log" role="button" data-url="{{ path('rep_log_delete', {id: repLog.id}) }}">
-                                                    <i class="fa-solid fa-ban"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    {% else %}
-                                        <tr>
-                                            <td colspan="4">Let's start to lift something !</td>
-                                        </tr>
-                                    {% endfor %}
                                     </tbody>
                                     <tfoot>
                                         <tr>
                                             <td class="fw-bold">Total</td>
-                                            <td class="fw-bold js-total-reps">{{ totalReps }}</td>
-                                            <td class="fw-bold js-total-weight">{{ totalWeight }}</td>
+                                            <td class="fw-bold js-total-reps">
+                                            </td>
+                                            <td class="fw-bold js-total-weight">
+                                            </td>
                                             <td>&nbsp;</td>
                                         </tr>
                                     </tfoot>

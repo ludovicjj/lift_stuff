@@ -21,9 +21,25 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[Route("/api", name: "rep_log_")]
 class RepLogController extends BaseController
 {
-    public function __construct(private EntityManagerInterface $entityManager, SerializerInterface $serializer)
+    public function __construct(
+        private EntityManagerInterface $entityManager,
+        SerializerInterface $serializer
+    )
     {
         parent::__construct($serializer);
+    }
+
+    #[Route("/reps", name: "list", methods: ['GET'])]
+    public function listRepLog(RepLogRepository $repLogRepository)
+    {
+        $repLogs = $repLogRepository->findBy(['user' => $this->getUser()]);
+        $models = [];
+        foreach ($repLogs as $repLog) {
+            $models[] = $this->createRepLogModel($repLog);
+        }
+        return $this->createApiResponse([
+            'items' => $models
+        ]);
     }
 
     #[Route("/reps/{id}", name: "delete", methods: ['DELETE'])]
