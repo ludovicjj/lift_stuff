@@ -3,6 +3,10 @@
 namespace App\Serializer\Denormalizer;
 
 use App\Entity\RepLog;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Doctrine\PropertyInfo\DoctrineExtractor;
+use Symfony\Component\PropertyInfo\Extractor\ReflectionExtractor;
+use Symfony\Component\PropertyInfo\PropertyInfoExtractor;
 use Symfony\Component\Serializer\Normalizer\ContextAwareDenormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\DenormalizerAwareTrait;
@@ -10,13 +14,16 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\PropertyInfo\Extractor\SerializerExtractor;
-use Symfony\Component\PropertyInfo\Extractor\PhpDocExtractor;
 
 class RepLogDenormalizer implements ContextAwareDenormalizerInterface, DenormalizerAwareInterface
 {
     use DenormalizerAwareTrait;
 
     private const ALREADY_CALLED = 'REP_LOG_DENORMALIZER_ALREADY_CALLED';
+
+    public function __construct(private EntityManagerInterface $entityManager)
+    {
+    }
 
     public function supportsDenormalization($data, string $type, string $format = null, array $context = []): bool
     {
@@ -32,12 +39,10 @@ class RepLogDenormalizer implements ContextAwareDenormalizerInterface, Denormali
         $context[self::ALREADY_CALLED] = true;
 
         $properties = $this->getPropertiesBySerializerGroups($type, $context);
-        $filterData = $this->getFilterData($data, $properties);
+        $data = $this->getFilterData($data, $properties);
+        $this->transformDataValuesTypeOrUnset($data, $type);
 
-        $phpDocExtractor = new PhpDocExtractor();
-        $filterAndTypedData = $this->convertDataTypeUsingPropertyType($filterData, $phpDocExtractor , $type);
-
-        return $this->denormalizer->denormalize($filterAndTypedData, $type, $format, $context);
+        return $this->denormalizer->denormalize($data, $type, $format, $context);
     }
 
     private function getPropertiesBySerializerGroups(string $type, array $context): array
@@ -57,51 +62,52 @@ class RepLogDenormalizer implements ContextAwareDenormalizerInterface, Denormali
         }, ARRAY_FILTER_USE_BOTH);
     }
 
-    private function convertDataTypeUsingPropertyType(
-        array $data,
-        PhpDocExtractor $phpDocExtractor,
-        string $type
-    ): array
+    private function transformDataValuesTypeOrUnset(&$data, string $type): void
     {
+        $propertyInfo = $this->getPropertyInfoExtractor();
         foreach ($data as $key => $value) {
-            $propertyInfoType = $phpDocExtractor->getTypes($type, $key)[0] ?? null;
-            $propertyType = $propertyInfoType?->getBuiltinType();
-
-            if ($propertyType) {
-                $isValidType = $this->unsetInvalidType($propertyType, $data, $key);
-                if (!$isValidType) {
-                    // stop current loop and run next or key will be redefined key/value bellow
-                    continue;
-                };
-                settype($value, $propertyType);
-                $data[$key] = $value;
+            $propertyType = $propertyInfo->getTypes($type, $key)[0]->getBuiltinType();
+            $isValidType = $this->isValidType($propertyType, $data, $key);
+            if (!$isValidType) {
+                unset($data[$key]);
+                continue;
             }
+            settype($value, $propertyType);
+            $data[$key] = $value;
         }
-        return $data;
     }
 
-    /**
-     * Supprime des elements du tableau si le type de la valeur est invalide.
-     * Exemple de donnée rentrante : ["reps" => "patate"] (Ici la valeur pour la clé 'reps' est 'string')
-     * PropertyType : return 'int' car dans RepLog::reps a l'annotation param null|int
-     * Donc la paire (clé/valeur) ici "reps" => "patate" est supprimé du tableau
-     */
-    private function unsetInvalidType(string $propertyType, array &$filterData, string $key)
+    private function isValidType(string $type, array $data, string $key): bool
     {
-        switch ($propertyType) {
+        switch ($type) {
             case 'string':
-                if (!is_string($filterData[$key])) {
-                    unset($filterData[$key]);
+                if (!is_string($data[$key])) {
                     return false;
                 }
                 break;
             case 'int':
-                if (!is_numeric($filterData[$key])) {
-                    unset($filterData[$key]);
+                if (!is_numeric($data[$key])) {
                     return false;
                 }
                 break;
         }
         return true;
+    }
+
+    private function getPropertyInfoExtractor(): PropertyInfoExtractor
+    {
+        $reflectionExtractor = new ReflectionExtractor();
+        $doctrineExtractor = new DoctrineExtractor($this->entityManager);
+
+        return new PropertyInfoExtractor(
+            [
+                $reflectionExtractor,
+                $doctrineExtractor
+            ],
+            [
+                $doctrineExtractor,
+                $reflectionExtractor
+            ]
+        );
     }
 }

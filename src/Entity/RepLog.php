@@ -20,42 +20,31 @@ class RepLog
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
-    #[Groups(['read_rep_log'])]
-    private int $id;
+    private ?int $id = null;
 
-    /** @var int|null $reps */
     #[ORM\Column(name: 'reps', type: 'integer')]
     #[
         Assert\NotBlank(message: "how many times did you lift this ?"),
         Assert\GreaterThan(value: 0, message: "You can certainly lift more than just 0 !")
     ]
-    #[Groups(['add_rep_log', 'read_rep_log'])]
+    #[Groups(['add_rep_log'])]
     private ?int $reps = null;
 
-    /** @var string|null $item */
     #[ORM\Column(name: "item", type: "string", length: 50)]
     #[
         Assert\NotBlank(message: "What did you lift ?"),
         Assert\Choice(callback: "getAllowedLiftItems")
     ]
-    #[Groups(['add_rep_log', 'read_rep_log'])]
+    #[Groups(['add_rep_log'])]
     private ?string $item = null;
 
     #[ORM\Column(name: "totalWeightLifted", type: "float")]
-    #[Groups(['add_rep_log', 'read_rep_log'])]
-    private ?float $totalWeightLifted;
+    private float $totalWeightLifted;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
     private User $user;
 
-
-    public function __construct(?string $item, ?int $reps)
-    {
-        $this->item = $item;
-        $this->reps = $reps;
-        $this->calculateTotalLifted();
-    }
 
     public function getId(): ?int
     {
@@ -84,6 +73,14 @@ class RepLog
         return $this->item;
     }
 
+    public function getItemLabel(): string
+    {
+        if (!$this->getItem()) {
+            throw new \LogicException('Item cannot be null');
+        }
+        return ucwords(str_replace('_', ' ', $this->getItem()));
+    }
+
     /** Used for choice value into RepLopType  */
     public static function getLiftedItemChoices(): array
     {
@@ -95,9 +92,16 @@ class RepLog
         return $choices;
     }
 
-    public function getTotalWeightLifted(): ?float
+    public function getTotalWeightLifted(): float
     {
         return $this->totalWeightLifted;
+    }
+
+    // Set totalWeightLifted with RepLogListener (PrePersist)
+    public function setTotalWeightLifted(float $total): self
+    {
+        $this->totalWeightLifted = $total;
+        return $this;
     }
 
     public function getUser(): User
@@ -110,25 +114,6 @@ class RepLog
         $this->user = $user;
 
         return $this;
-    }
-
-    private function calculateTotalLifted(): void
-    {
-        if (!$this->getItem() || !$this->getReps()) {
-            $this->totalWeightLifted = null;
-            return;
-        }
-
-        if (!array_key_exists($this->getItem(), self::ALLOWED_LIFT_ITEMS)) {
-            $this->totalWeightLifted = null;
-            return;
-        }
-
-        // forcer le type en float ?
-        $weight = self::ALLOWED_LIFT_ITEMS[$this->getItem()];
-        $totalWeight = $this->getReps() * $weight;
-
-        $this->totalWeightLifted = $totalWeight;
     }
 
     /**

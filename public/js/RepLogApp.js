@@ -4,6 +4,7 @@ class RepLogApp {
      */
     constructor(wrapper) {
         this.wrapper = wrapper;
+        this.form = this.wrapper.querySelector('.js-new-rep-log-form')
 
         this.wrapper.querySelectorAll('.js-delete-rep-log').forEach(link => {
             link.addEventListener('click', this.handleRepLogDelete.bind(this))
@@ -12,15 +13,16 @@ class RepLogApp {
             link.addEventListener('click', this.handleRowClick)
         })
 
-        this.wrapper.querySelector('.js-new-rep-log-form').addEventListener('submit', this.handleRepLogAdd.bind(this))
+        this.form.addEventListener('submit', this.handleRepLogAdd.bind(this))
     }
 
     handleRepLogAdd(e) {
         e.preventDefault();
-        const form = e.currentTarget;
-        const formData = new FormData(form);
+        const formData = new FormData(this.form);
         const json = JSON.stringify(Object.fromEntries(formData));
-        const addUrl = form.getAttribute('action');
+        const url = this.form.getAttribute('action');
+        const submit = this.form.querySelector('button[type="submit"]');
+        const submitText = submit.textContent;
 
         const options = {
             method: 'POST',
@@ -30,63 +32,34 @@ class RepLogApp {
             },
             body: json
         };
-        fetch(addUrl, options)
+        fetch(url, options)
             .then(async response => {
                 const isJson = response.headers.get('content-type')?.includes('application/json');
                 const data = isJson ? await response.json() : null;
-                const submit = form.querySelector('button[type="submit"]');
-                const submitText = submit.textContent;
+
                 this.toggleDisabledButton(submit);
                 submit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-
-                const ids = ['reps', 'item'];
-                ids.map(id => {
-                    const field = form.querySelector(`#${id}`);
-                    field.classList.remove('is-invalid');
-                    field.parentNode.querySelector('.invalid-feedback')?.remove();
-
-                })
+                this.removeFormErrors();
 
                 if (response.ok) {
-                    const {reps, totalWeightLifted} = data;
-                    console.log(data);
-                    // Build <tr>
-                    const tr = this.createElement('tr')
-                    tr.setAttribute('data-weight', totalWeightLifted);
-                    tr.setAttribute('data-reps', reps);
+                    // Build and append new row
+                    const row = this.createRowFragment(data).querySelector('tr');
+                    this.wrapper.querySelector('tbody').appendChild(row);
 
-                    // Build all <td>
-                    const cells = this.createRow(data)
+                    // Add Listener to new delete button
+                    const link = row.querySelector('.js-delete-rep-log');
+                    link.addEventListener('click', this.handleRepLogDelete.bind(this))
 
-                    // Append each <td> to <tr>
-                    cells.forEach(cell => {
-                        tr.appendChild(cell)
-                    })
-
-                    // Update TotalWeightLifted && TotalReps
-                    this.wrapper.querySelector('table tbody').appendChild(tr);
                     this.updateTotalWeightLifted();
                     this.updateTotalReps();
 
                     // Clear field value
-                    form.querySelector(`#reps`).value = '';
-                    form.querySelector(`#item`).value = '';
+                    this.clearForm();
 
-                } else if(response.status === 422) {
+                } else if (response.status === 422) {
                     const errors = data.errors
-                    errors.forEach(({property, message}) => {
-                        const div = this.createElement('div')
-                        div.classList.add('invalid-feedback');
-                        div.textContent = message
-                        const input = this.wrapper.querySelector(`#${property}`);
-                        input.classList.add('is-invalid');
-                        input.parentNode.appendChild(div);
-                    })
+                    this.addFormErrors(errors);
                 } else {
-                    setTimeout(() => {
-                        this.toggleDisabledButton(submit);
-                        submit.textContent = submitText;
-                    }, 300)
                     this.sendError(data.message, data.code);
                 }
                 setTimeout(() => {
@@ -95,6 +68,10 @@ class RepLogApp {
                 }, 300)
             })
             .catch(error => {
+                setTimeout(() => {
+                    this.toggleDisabledButton(submit);
+                    submit.textContent = submitText;
+                }, 300)
                 console.error('There was an error!', error);
             })
     }
@@ -164,6 +141,56 @@ class RepLogApp {
         this.wrapper.querySelector('.js-total-reps').textContent = totalReps.toString();
     }
 
+    removeFormErrors() {
+        const fields = this.form.querySelectorAll('input, select');
+
+        fields.forEach(function(field) {
+            field.classList.remove('is-invalid');
+            field.parentNode.querySelector('.invalid-feedback')?.remove();
+        });
+    }
+
+    /**
+     * @param {Object[]} errors
+     */
+    addFormErrors(errors) {
+        errors.forEach(({property, message})  => {
+            const field = this.form.querySelector(`[name="${property}"]`);
+            if (field) {
+                field.classList.add('is-invalid');
+
+                const feedBack = this.createElement('div');
+                feedBack.classList.add('invalid-feedback');
+                feedBack.innerText = message;
+                field.after(feedBack);
+            }
+        });
+    }
+
+    clearForm() {
+        this.form.reset();
+    }
+
+    /**
+     * @param {number} id
+     * @param {string} item
+     * @param {number} reps
+     * @param {number} totalWeightLifted
+     * @param {Object} links
+     * @return {DocumentFragment}
+     */
+    createRowFragment({id, item, reps, totalWeightLifted, links}) {
+        const template  = document.createElement('template');
+        template.innerHTML = `<tr data-weight="${totalWeightLifted}" data-reps="${reps}">
+            <td>${item}</td>
+            <td>${reps}</td>
+            <td>${totalWeightLifted}</td>
+            <td><a class="btn btn-blue btn-sm js-delete-rep-log" role="button" data-url="${links.self}"><i class="fa-solid fa-ban"></i></a></td>
+        </tr>`;
+        return template.content;
+
+    }
+
     /**
      * Disabled or enable bootstrap button
      * @param {HTMLElement} button
@@ -209,49 +236,10 @@ class RepLogApp {
     }
 
     /**
-     * @param {number} id
-     * @param {string} item
-     * @param {number} reps
-     * @param {number} totalWeightLifted
-     * @return {HTMLElement[]}
-     */
-    createRow({id, item, reps, totalWeightLifted}) {
-        // Item
-        const tdItem = this.createElement('td')
-        tdItem.textContent = item;
-        // Reps
-        const tdReps = this.createElement('td')
-        tdReps.textContent = reps.toString();
-        // Weight
-        const tdWeight = this.createElement('td')
-        tdWeight.textContent = totalWeightLifted.toString();
-        // Delete Link
-        const tdDelete = this.createElement('td');
-        const linkDelete = this.createElement('a');
-        linkDelete.classList.add("btn")
-        linkDelete.classList.add("btn-blue")
-        linkDelete.classList.add("btn-sm")
-        linkDelete.classList.add("js-delete-rep-log")
-        linkDelete.setAttribute('role', 'button');
-        linkDelete.setAttribute('data-url', `/api/reps/${id}`);
-        linkDelete.addEventListener('click', this.handleRepLogDelete.bind(this));
-        const i =this.createElement('i');
-        i.classList.add('fa-solid')
-        i.classList.add('fa-ban')
-        linkDelete.appendChild(i);
-        tdDelete.appendChild(linkDelete);
-
-        const tds = [];
-        tds.push(tdItem, tdReps, tdWeight, tdDelete);
-        return tds
-    }
-
-    /**
      * @param {string} tagName
      * @return {HTMLElement}
      */
-    createElement(tagName)
-    {
+    createElement(tagName) {
         return document.createElement(tagName)
     }
 }

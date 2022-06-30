@@ -11,6 +11,40 @@ class AddRepLogTest extends PantherTestCase
 {
     use ResetDatabase, Factories, FunctionalTestTrait;
 
+    public function testAddRepLogWithBadToken()
+    {
+        $client = static::createPantherClient(
+            [],
+            [],
+            [
+                'capabilities' => [
+                    'goog:loggingPrefs' => [
+                        'browser' => 'ALL'
+                    ],
+                ]
+            ]
+        );
+        $this->loadFixtures();
+
+        $this->loginPantherClient($client);
+        $crawler = $client->request('GET', '/');
+        $values = [
+            'item' => 'cat',
+            'reps' => '5',
+        ];
+        $client->executeScript("document.querySelector('.js-new-rep-log-form input[type=\"hidden\"').value = 'fail'");
+        $form = $crawler->filter('.js-new-rep-log-form')->form($values);
+        $this->assertSame(['item' => 'cat','reps' => '5','_token' => 'fail'], $form->getValues());
+        $crawler->filter('.js-new-rep-log-form button')->click();
+        sleep(1);
+        $logs = $client->getWebDriver()->manage()->getLog('browser');
+        $this->assertCount(2, $logs);
+        $this->assertStringContainsString(
+            "Failed to load resource: the server responded with a status of 400 (Bad Request)",
+            $logs[0]['message']
+        );
+    }
+
     public function testAddRepLogWithEmptyForm()
     {
         $client = static::createPantherClient();
@@ -84,44 +118,9 @@ class AddRepLogTest extends PantherTestCase
 
         $this->assertEquals(6, $crawler->filter('.js-rep-log-table tbody tr')->count());
         $row = $crawler->filter('.js-rep-log-table tbody tr')->last();
-        $this->assertEquals('cat', $row->filter('td')->getElement(0)->getText());
+        $this->assertEquals('Cat', $row->filter('td')->getElement(0)->getText());
         $this->assertEquals('5', $row->filter('td')->getElement(1)->getText());
         $this->assertEquals('45', $row->filter('td')->getElement(2)->getText());
-        $client->getWebDriver()->manage()->getLog('browser');
-    }
-
-    public function testAddRepLogWithBadToken()
-    {
-        $client = static::createPantherClient(
-            [],
-            [],
-            [
-                'capabilities' => [
-                    'goog:loggingPrefs' => [
-                        'browser' => 'ALL'
-                    ],
-                ]
-            ]
-        );
-        $this->loadFixtures();
-
-        $this->loginPantherClient($client);
-        $crawler = $client->request('GET', '/');
-        $values = [
-            'item' => 'cat',
-            'reps' => '5',
-        ];
-        $client->executeScript("document.querySelector('.js-new-rep-log-form input[type=\"hidden\"').value = 'fail'");
-        $form = $crawler->filter('.js-new-rep-log-form')->form($values);
-        $this->assertSame(['item' => 'cat','reps' => '5','_token' => 'fail'], $form->getValues());
-        $crawler->filter('.js-new-rep-log-form button')->click();
-        sleep(1);
-        $logs = $client->getWebDriver()->manage()->getLog('browser');
-        $this->assertCount(2, $logs);
-        $this->assertStringContainsString(
-            "Failed to load resource: the server responded with a status of 403 (Forbidden)",
-            $logs[0]['message']
-        );
     }
 
 }
