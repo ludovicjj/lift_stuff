@@ -4,16 +4,54 @@ class RepLogApp {
      */
     constructor(wrapper) {
         this.wrapper = wrapper;
-        this.form = this.wrapper.querySelector('.js-new-rep-log-form')
+        this.form = this.wrapper.querySelector('.js-new-rep-log-form');
+        this.isTbodyEmpty = false;
 
-        this.wrapper.querySelectorAll('.js-delete-rep-log').forEach(link => {
-            link.addEventListener('click', this.handleRepLogDelete.bind(this))
-        })
-        this.wrapper.querySelectorAll('tbody tr').forEach(link => {
-            link.addEventListener('click', this.handleRowClick)
-        })
-
+        this.loadRepLogs().then(() => {
+            // Delete repLog
+            this.wrapper.querySelectorAll('.js-delete-rep-log').forEach(link => {
+                link.addEventListener('click', this.handleRepLogDelete.bind(this))
+            })
+            // Row click
+            this.wrapper.querySelectorAll('tbody tr').forEach(row => {
+                row.addEventListener('click', this.handleRowClick)
+            })
+        }).catch(error => {
+            console.error('There was an error!', error);
+        });
+        // Add repLog
         this.form.addEventListener('submit', this.handleRepLogAdd.bind(this))
+    }
+
+    handleRowClick() {
+    }
+
+    async loadRepLogs() {
+        const response = await fetch('/api/reps', {
+            method: 'GET',
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+            }
+        });
+        const isJson = response.headers.get('content-type')?.includes('application/json');
+        const data = isJson ? await response.json() : null;
+
+        if (response.ok) {
+            if (response.status === 204) {
+                this.isTbodyEmpty = true;
+                const row = this.createDefaultRowFragment().querySelector('tr');
+                this.wrapper.querySelector('tbody').appendChild(row);
+            } else {
+                data.items.forEach((item, key) => {
+                    const row = this.createRowFragment(item).querySelector('tr');
+                    this.wrapper.querySelector('tbody').appendChild(row);
+                })
+            }
+            this.updateTotalWeightLifted();
+            this.updateTotalReps();
+        } else {
+            return Promise.reject(response.status);
+        }
     }
 
     handleRepLogAdd(e) {
@@ -42,6 +80,12 @@ class RepLogApp {
                 this.removeFormErrors();
 
                 if (response.ok) {
+                    // Remove default row if rep table start with no data
+                    if (this.isTbodyEmpty) {
+                        this.wrapper.querySelector('.default-row').remove();
+                        this.isTbodyEmpty = false;
+                    }
+
                     // Build and append new row
                     const row = this.createRowFragment(data).querySelector('tr');
                     this.wrapper.querySelector('tbody').appendChild(row);
@@ -81,7 +125,6 @@ class RepLogApp {
         const deleteBtn = e.currentTarget;
         const deleteUrl = deleteBtn.getAttribute('data-url');
         const row = deleteBtn.closest('tr');
-        const tableContainer = this.wrapper.querySelector('.table-responsive');
 
         this.toggleDisabledButton(deleteBtn);
         this.toggleMotionToIcon(deleteBtn.querySelector('.fa-ban'), 'fa-spin');
@@ -97,17 +140,12 @@ class RepLogApp {
             .then(async response => {
                 const isJson = response.headers.get('content-type')?.includes('application/json');
                 const data = isJson ? await response.json() : null;
-
                 if (response.ok) {
                     row.classList.add('hide');
                     setTimeout(() => {
                         row.remove();
                         this.updateTotalWeightLifted();
                         this.updateTotalReps();
-                        if (tableContainer.scrollHeight <= 276) {
-                            tableContainer.style.overflowY = "visible";
-                            tableContainer.style.paddingRight = `${0}px`;
-                        }
                     }, 500);
                 } else {
                     this.toggleDisabledButton(deleteBtn);
@@ -121,13 +159,12 @@ class RepLogApp {
             })
     }
 
-    handleRowClick() {
-    }
-
     updateTotalWeightLifted () {
         let totalWeight = 0;
         this.wrapper.querySelectorAll('tbody tr').forEach(function (row) {
-           totalWeight += parseFloat(row.getAttribute('data-weight'));
+            if (row.getAttribute('data-weight')) {
+                totalWeight += parseFloat(row.getAttribute('data-weight'));
+            }
         })
 
         this.wrapper.querySelector('.js-total-weight').textContent = totalWeight.toString();
@@ -136,7 +173,9 @@ class RepLogApp {
     updateTotalReps() {
         let totalReps = 0;
         this.wrapper.querySelectorAll('tbody tr').forEach(function (row) {
-            totalReps += parseInt(row.getAttribute('data-reps'));
+            if (row.getAttribute('data-reps')) {
+                totalReps += parseInt(row.getAttribute('data-reps'));
+            }
         })
         this.wrapper.querySelector('.js-total-reps').textContent = totalReps.toString();
     }
@@ -188,7 +227,13 @@ class RepLogApp {
             <td><a class="btn btn-blue btn-sm js-delete-rep-log" role="button" data-url="${links.self}"><i class="fa-solid fa-ban"></i></a></td>
         </tr>`;
         return template.content;
+    }
 
+    createDefaultRowFragment()
+    {
+        const template  = document.createElement('template');
+        template.innerHTML = `<tr><td colspan="4" class="default-row">Let's start to lift something !</td></tr>`;
+        return template.content;
     }
 
     /**
