@@ -19,6 +19,7 @@ class RepLogApp {
         }).catch(error => {
             console.error('There was an error!', error);
         });
+
         // Add repLog
         this.form.addEventListener('submit', this.handleRepLogAdd.bind(this))
     }
@@ -79,6 +80,13 @@ class RepLogApp {
                 submit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
                 this.removeFormErrors();
 
+                // error
+                if (!response.ok) {
+                    const error = this.buildError(data.message, data.code, data?.errors);
+                    return Promise.reject(error);
+                }
+
+                // success
                 if (response.ok) {
                     // Remove default row if rep table start with no data
                     if (this.isTbodyEmpty) {
@@ -99,24 +107,21 @@ class RepLogApp {
 
                     // Clear field value
                     this.clearForm();
-
-                } else if (response.status === 422) {
-                    const errors = data.errors
-                    this.addFormErrors(errors);
-                } else {
-                    this.sendError(data.message, data.code);
                 }
-                setTimeout(() => {
-                    this.toggleDisabledButton(submit);
-                    submit.textContent = submitText;
-                }, 300)
+
             })
             .catch(error => {
+                if (error.code === 422) {
+                    this.addFormErrors(error.errorsData);
+                } else {
+                    console.error(error.message);
+                }
+            })
+            .finally(() => {
                 setTimeout(() => {
                     this.toggleDisabledButton(submit);
                     submit.textContent = submitText;
                 }, 300)
-                console.error('There was an error!', error);
             })
     }
 
@@ -229,8 +234,7 @@ class RepLogApp {
         return template.content;
     }
 
-    createDefaultRowFragment()
-    {
+    createDefaultRowFragment() {
         const template  = document.createElement('template');
         template.innerHTML = `<tr><td colspan="4" class="default-row">Let's start to lift something !</td></tr>`;
         return template.content;
@@ -261,8 +265,7 @@ class RepLogApp {
      * @param {HTMLElement} icon
      * @param {string} motion
      */
-    toggleMotionToIcon(icon, motion)
-    {
+    toggleMotionToIcon(icon, motion) {
         icon.classList.toggle(motion)
     }
 
@@ -278,6 +281,21 @@ class RepLogApp {
         }
 
         throw (errorResponse);
+    }
+
+    /**
+     * @param {string} message the error message
+     * @param {number} code the error status code, default is 400
+     * @param {[]|Object[]} errorsData the errors data returned
+     * @return {Object} the error object
+     */
+    buildError(message = '', code = 0, errorsData = []) {
+        return {
+            type: 'Error',
+            message: message || 'Something went wrong',
+            errorsData: errorsData,
+            code: code || 400
+        };
     }
 
     /**
