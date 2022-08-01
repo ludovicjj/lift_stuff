@@ -83,7 +83,6 @@ class DeleteRepLogTest extends PantherTestCase
         $deleteLink = $crawler->filter('.js-delete-rep-log')->first();
         $deleteLink->click();
         sleep(1);
-
         $this->assertEquals(5, $crawler->filter('.js-rep-log-table tbody tr')->count());
     }
 }
