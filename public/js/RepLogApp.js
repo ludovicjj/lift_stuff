@@ -86,29 +86,37 @@ class RepLogApp {
                     return Promise.reject(error);
                 }
 
-                // success
-                if (response.ok) {
-                    // Remove default row if rep table start with no data
-                    if (this.isTbodyEmpty) {
-                        this.wrapper.querySelector('.default-row').remove();
-                        this.isTbodyEmpty = false;
-                    }
+                return fetch(response.headers.get('Location'), {
+                    method: 'GET',
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                        'Accept': 'application/json'
+                    },
+                })
+            })
+            .then(async response => {
+                const isJson = response.headers.get('content-type')?.includes('application/json');
+                const data = isJson ? await response.json() : null;
 
-                    // Build and append new row
-                    const row = this.createRowFragment(data).querySelector('tr');
-                    this.wrapper.querySelector('tbody').appendChild(row);
-
-                    // Add Listener to new delete button
-                    const link = row.querySelector('.js-delete-rep-log');
-                    link.addEventListener('click', this.handleRepLogDelete.bind(this))
-
-                    this.updateTotalWeightLifted();
-                    this.updateTotalReps();
-
-                    // Clear field value
-                    this.clearForm();
+                // Remove default row if rep table start with no data
+                if (this.isTbodyEmpty) {
+                    this.wrapper.querySelector('.default-row').remove();
+                    this.isTbodyEmpty = false;
                 }
 
+                // Build and append new row
+                const row = this.createRowFragment(data).querySelector('tr');
+                this.wrapper.querySelector('tbody').appendChild(row);
+
+                // Add Listener to new delete button
+                const link = row.querySelector('.js-delete-rep-log');
+                link.addEventListener('click', this.handleRepLogDelete.bind(this))
+
+                this.updateTotalWeightLifted();
+                this.updateTotalReps();
+
+                // Clear field value
+                this.clearForm();
             })
             .catch(error => {
                 if (error.code === 422) {
