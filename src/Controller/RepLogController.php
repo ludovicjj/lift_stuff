@@ -30,7 +30,7 @@ class RepLogController extends BaseController
     }
 
     #[Route("/reps", name: "list", methods: ['GET'])]
-    public function listRepLog(RepLogRepository $repLogRepository)
+    public function listRepLog(RepLogRepository $repLogRepository): Response
     {
         $repLogs = $repLogRepository->findBy(['user' => $this->getUser()]);
         $models = [];
@@ -40,6 +40,20 @@ class RepLogController extends BaseController
         return $this->createApiResponse([
             'items' => $models
         ]);
+    }
+
+    #[Route("/reps/{id}", name: "get", methods: ['GET'])]
+    public function getRepLog(RepLogRepository $repLogRepository, Request $request): Response
+    {
+        if ($request->isXmlHttpRequest()) {
+            $repLog = $repLogRepository->find($request->attributes->get('id'));
+            $model = $this->createRepLogModel($repLog);
+            return $this->createApiResponse($model);
+        }
+
+        return new JsonResponse([
+            'message' => 'Request header X-Requested-With is missing'
+        ], Response::HTTP_BAD_REQUEST);
     }
 
     #[Route("/reps/{id}", name: "delete", methods: ['DELETE'])]
@@ -94,8 +108,12 @@ class RepLogController extends BaseController
             $this->entityManager->persist($repLog);
             $this->entityManager->flush();
 
-            $apiModel = $this->createRepLogModel($repLog);
-            return $this->createApiResponse($apiModel, 201);
+            $response = new Response(null, 204);
+            $response->headers->set(
+                'Location',
+                $this->generateUrl('rep_log_get', ['id' => $repLog->getId()])
+            );
+            return $response;
         }
 
         return new JsonResponse([
