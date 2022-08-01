@@ -40,8 +40,8 @@ class AddRepLogTest extends PantherTestCase
         $logs = $client->getWebDriver()->manage()->getLog('browser');
         $this->assertCount(2, $logs);
         $this->assertStringContainsString(
-            "Failed to load resource: the server responded with a status of 400 (Bad Request)",
-            $logs[0]['message']
+            "Invalid CSRF token.",
+            $logs[1]['message']
         );
     }
 
@@ -122,5 +122,4 @@ class AddRepLogTest extends PantherTestCase
         $this->assertEquals('5', $row->filter('td')->getElement(1)->getText());
         $this->assertEquals('45', $row->filter('td')->getElement(2)->getText());
     }
-
 }
