@@ -43,7 +43,7 @@ class RepLogApp {
                 const row = this.createDefaultRowFragment().querySelector('tr');
                 this.wrapper.querySelector('tbody').appendChild(row);
             } else {
-                data.items.forEach((item, key) => {
+                data.items.forEach((item) => {
                     const row = this.createRowFragment(item).querySelector('tr');
                     this.wrapper.querySelector('tbody').appendChild(row);
                 })
