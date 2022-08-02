@@ -19,7 +19,7 @@ trait FunctionalTestTrait
         ]);
         RepLogFactory::new(['user' => $user])
             ->withItem($items)
-            ->many(5)
+            ->many(3)
             ->create()
         ;
     }
