@@ -4,16 +4,48 @@ class RepLogApp {
      */
     constructor(wrapper) {
         this.wrapper = wrapper;
-        this.form = this.wrapper.querySelector('.js-new-rep-log-form')
+        this.form = this.wrapper.querySelector('.js-new-rep-log-form');
+        this.isTbodyEmpty = false;
 
-        this.wrapper.querySelectorAll('.js-delete-rep-log').forEach(link => {
-            link.addEventListener('click', this.handleRepLogDelete.bind(this))
-        })
-        this.wrapper.querySelectorAll('tbody tr').forEach(link => {
-            link.addEventListener('click', this.handleRowClick)
-        })
+        this.loadRepLogs().then(() => {
+            // Delete repLog
+            this.wrapper.querySelectorAll('.js-delete-rep-log').forEach(link => {
+                link.addEventListener('click', this.handleRepLogDelete.bind(this))
+            })
+        }).catch(error => {
+            console.error('There was an error!', error);
+        });
 
+        // Add repLog
         this.form.addEventListener('submit', this.handleRepLogAdd.bind(this))
+    }
+
+    async loadRepLogs() {
+        const response = await fetch('/api/reps', {
+            method: 'GET',
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+            }
+        });
+        const isJson = response.headers.get('content-type')?.includes('application/json');
+        const data = isJson ? await response.json() : null;
+
+        if (response.ok) {
+            if (response.status === 204) {
+                this.isTbodyEmpty = true;
+                const row = this.createDefaultRowFragment().querySelector('tr');
+                this.wrapper.querySelector('tbody').appendChild(row);
+            } else {
+                data.items.forEach((item) => {
+                    const row = this.createRowFragment(item).querySelector('tr');
+                    this.wrapper.querySelector('tbody').appendChild(row);
+                })
+            }
+            this.updateTotalWeightLifted();
+            this.updateTotalReps();
+        } else {
+            return Promise.reject(response.status);
+        }
     }
 
     handleRepLogAdd(e) {
@@ -23,6 +55,10 @@ class RepLogApp {
         const url = this.form.getAttribute('action');
         const submit = this.form.querySelector('button[type="submit"]');
         const submitText = submit.textContent;
+
+        // disable submit button and change text content
+        this.toggleDisabledButton(submit);
+        submit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
 
         const options = {
             method: 'POST',
@@ -37,11 +73,41 @@ class RepLogApp {
                 const isJson = response.headers.get('content-type')?.includes('application/json');
                 const data = isJson ? await response.json() : null;
 
-                this.toggleDisabledButton(submit);
-                submit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                // Clear form errors
                 this.removeFormErrors();
 
+                // error
+                if (!response.ok) {
+                    const error = this.buildError(data.message, data.code, data?.errors);
+                    return Promise.reject(error);
+                }
+
+                return fetch(response.headers.get('Location'), {
+                    method: 'GET',
+                    headers: {
+                        "X-Requested-With": "XMLHttpRequest",
+                        'Accept': 'application/json'
+                    },
+                })
+            })
+            .then(async response => {
+                const isJson = response.headers.get('content-type')?.includes('application/json');
+                const data = isJson ? await response.json() : null;
+
                 if (response.ok) {
+                    // success alert
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Your lift have been added with success',
+                    })
+
+                    // Remove default row if rep table start with no data
+                    if (this.isTbodyEmpty) {
+                        this.wrapper.querySelector('.default-row').remove();
+                        this.isTbodyEmpty = false;
+                    }
+
                     // Build and append new row
                     const row = this.createRowFragment(data).querySelector('tr');
                     this.wrapper.querySelector('tbody').appendChild(row);
@@ -55,33 +121,61 @@ class RepLogApp {
 
                     // Clear field value
                     this.clearForm();
-
-                } else if (response.status === 422) {
-                    const errors = data.errors
-                    this.addFormErrors(errors);
-                } else {
-                    this.sendError(data.message, data.code);
                 }
-                setTimeout(() => {
-                    this.toggleDisabledButton(submit);
-                    submit.textContent = submitText;
-                }, 300)
             })
             .catch(error => {
+                if (error.code === 422) {
+                    this.addFormErrors(error.errorsData);
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: `Something went wrong! (${error.message})`,
+                    })
+                }
+            })
+            .finally(() => {
                 setTimeout(() => {
                     this.toggleDisabledButton(submit);
                     submit.textContent = submitText;
                 }, 300)
-                console.error('There was an error!', error);
             })
     }
 
     handleRepLogDelete(e) {
         e.preventDefault();
         const deleteBtn = e.currentTarget;
+        Swal.fire({
+            icon: 'question',
+            title: 'Delete',
+            text: 'Are you sure you want to delete this lift ?',
+            showCancelButton: true,
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                return this.deleteRepLog(deleteBtn);
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Deleted!',
+                    text:'Your lift has been deleted.',
+                    icon:'success'
+                })
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                console.log('cancel')
+            }
+        }).catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: `Something went wrong! (${error.message})`,
+            })
+        })
+    }
+
+    deleteRepLog(deleteBtn) {
         const deleteUrl = deleteBtn.getAttribute('data-url');
         const row = deleteBtn.closest('tr');
-        const tableContainer = this.wrapper.querySelector('.table-responsive');
 
         this.toggleDisabledButton(deleteBtn);
         this.toggleMotionToIcon(deleteBtn.querySelector('.fa-ban'), 'fa-spin');
@@ -93,41 +187,37 @@ class RepLogApp {
             }
         }
 
-        fetch(deleteUrl, options)
+        return fetch(deleteUrl, options)
             .then(async response => {
                 const isJson = response.headers.get('content-type')?.includes('application/json');
                 const data = isJson ? await response.json() : null;
-
+                if (!response.ok) {
+                    this.sendError(data.message, data.code);
+                }
                 if (response.ok) {
                     row.classList.add('hide');
                     setTimeout(() => {
                         row.remove();
                         this.updateTotalWeightLifted();
                         this.updateTotalReps();
-                        if (tableContainer.scrollHeight <= 276) {
-                            tableContainer.style.overflowY = "visible";
-                            tableContainer.style.paddingRight = `${0}px`;
-                        }
                     }, 500);
-                } else {
-                    this.toggleDisabledButton(deleteBtn);
-                    this.toggleMotionToIcon(deleteBtn.querySelector('.fa-ban'), 'fa-spin');
-                    this.sendError(data.message, data.code);
                 }
-
             })
             .catch(error => {
-                console.error('There was an error!', error);
+                this.sendError(error.message, error.code);
             })
-    }
-
-    handleRowClick() {
+            .finally(() => {
+                this.toggleDisabledButton(deleteBtn);
+                this.toggleMotionToIcon(deleteBtn.querySelector('.fa-ban'), 'fa-spin');
+            })
     }
 
     updateTotalWeightLifted () {
         let totalWeight = 0;
         this.wrapper.querySelectorAll('tbody tr').forEach(function (row) {
-           totalWeight += parseFloat(row.getAttribute('data-weight'));
+            if (row.getAttribute('data-weight')) {
+                totalWeight += parseFloat(row.getAttribute('data-weight'));
+            }
         })
 
         this.wrapper.querySelector('.js-total-weight').textContent = totalWeight.toString();
@@ -136,7 +226,9 @@ class RepLogApp {
     updateTotalReps() {
         let totalReps = 0;
         this.wrapper.querySelectorAll('tbody tr').forEach(function (row) {
-            totalReps += parseInt(row.getAttribute('data-reps'));
+            if (row.getAttribute('data-reps')) {
+                totalReps += parseInt(row.getAttribute('data-reps'));
+            }
         })
         this.wrapper.querySelector('.js-total-reps').textContent = totalReps.toString();
     }
@@ -188,7 +280,12 @@ class RepLogApp {
             <td><a class="btn btn-blue btn-sm js-delete-rep-log" role="button" data-url="${links.self}"><i class="fa-solid fa-ban"></i></a></td>
         </tr>`;
         return template.content;
+    }
 
+    createDefaultRowFragment() {
+        const template  = document.createElement('template');
+        template.innerHTML = `<tr><td colspan="4" class="default-row">Let's start to lift something !</td></tr>`;
+        return template.content;
     }
 
     /**
@@ -216,8 +313,7 @@ class RepLogApp {
      * @param {HTMLElement} icon
      * @param {string} motion
      */
-    toggleMotionToIcon(icon, motion)
-    {
+    toggleMotionToIcon(icon, motion) {
         icon.classList.toggle(motion)
     }
 
@@ -233,6 +329,21 @@ class RepLogApp {
         }
 
         throw (errorResponse);
+    }
+
+    /**
+     * @param {string} message the error message
+     * @param {number} code the error status code, default is 400
+     * @param {[]|Object[]} errorsData the errors data returned
+     * @return {Object} the error object
+     */
+    buildError(message = '', code = 0, errorsData = []) {
+        return {
+            type: 'Error',
+            message: message || 'Something went wrong',
+            errorsData: errorsData,
+            code: code || 400
+        };
     }
 
     /**

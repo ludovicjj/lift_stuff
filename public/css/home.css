@@ -80,7 +80,7 @@ form.js-new-rep-log-form .row .col:last-child {
     flex: 1 1 25%;
     background-color: var(--grey-light-color);
 }
-.card-reps .card-content table tbody tr td:last-child,
+.card-reps .card-content table tbody tr td:not(.default-row):last-child,
 .card-reps .card-content table tfoot tr td:last-child,
 .card-reps .card-content table thead tr th:last-child
 {

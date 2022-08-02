@@ -11,19 +11,9 @@ class AddRepLogTest extends PantherTestCase
 {
     use ResetDatabase, Factories, FunctionalTestTrait;
 
-    public function testAddRepLogWithBadToken()
+    public function testAddRepLogWithInvalidToken()
     {
-        $client = static::createPantherClient(
-            [],
-            [],
-            [
-                'capabilities' => [
-                    'goog:loggingPrefs' => [
-                        'browser' => 'ALL'
-                    ],
-                ]
-            ]
-        );
+        $client = static::createPantherClient();
         $this->loadFixtures();
 
         $this->loginPantherClient($client);
@@ -36,13 +26,14 @@ class AddRepLogTest extends PantherTestCase
         $form = $crawler->filter('.js-new-rep-log-form')->form($values);
         $this->assertSame(['item' => 'cat','reps' => '5','_token' => 'fail'], $form->getValues());
         $crawler->filter('.js-new-rep-log-form button')->click();
-        sleep(1);
-        $logs = $client->getWebDriver()->manage()->getLog('browser');
-        $this->assertCount(2, $logs);
-        $this->assertStringContainsString(
-            "Failed to load resource: the server responded with a status of 400 (Bad Request)",
-            $logs[0]['message']
-        );
+
+        $client->waitForVisibility('.swal2-modal');
+
+        $modalTitleError = $crawler->filter('.swal2-modal #swal2-title')->getText();
+        $modalTextError = $crawler->filter('.swal2-modal #swal2-html-container')->getText();
+        $this->assertSame('Oops...', $modalTitleError);
+        $this->assertSame('Something went wrong! (Invalid CSRF token.)', $modalTextError);
+        $client->takeScreenshot('./var/screenshots/add-lift-invalid-csrf-token.png');
     }
 
     public function testAddRepLogWithEmptyForm()
@@ -54,9 +45,10 @@ class AddRepLogTest extends PantherTestCase
         $crawler = $client->request('GET', '/');
 
         $crawler->filter('.js-new-rep-log-form button')->click();
-        sleep(1);
-        $this->assertEquals(2, $crawler->filter('div.invalid-feedback')->count());
 
+        $client->waitFor('.invalid-feedback');
+
+        $this->assertEquals(2, $crawler->filter('div.invalid-feedback')->count());
         $this->assertEquals(
             'What did you lift ?',
             $crawler->filter('div.invalid-feedback')->getElement(0)->getText()
@@ -65,6 +57,7 @@ class AddRepLogTest extends PantherTestCase
             'how many times did you lift this ?',
             $crawler->filter('div.invalid-feedback')->getElement(1)->getText()
         );
+        $client->takeScreenshot('./var/screenshots/add-lift-empty-form.png');
     }
 
     public function testAddRepLogWithEmptyItem()
@@ -80,8 +73,12 @@ class AddRepLogTest extends PantherTestCase
         ];
         $crawler->filter('.js-new-rep-log-form')->form($values);
         $crawler->filter('.js-new-rep-log-form button')->click();
-        sleep(1);
-        $this->assertEquals(1, $crawler->filter('div.invalid-feedback')->count());
+
+        $client->waitFor('.invalid-feedback');
+
+        $this->assertSelectorWillExist('#item.is-invalid');
+        $this->assertSame('What did you lift ?',  $crawler->filter('.invalid-feedback')->getText());
+        $client->takeScreenshot('./var/screenshots/add-lift-empty-form-item.png');
     }
 
     public function testAddRepLogWithEmptyReps()
@@ -97,8 +94,12 @@ class AddRepLogTest extends PantherTestCase
         ];
         $crawler->filter('.js-new-rep-log-form')->form($values);
         $crawler->filter('.js-new-rep-log-form button')->click();
-        sleep(1);
-        $this->assertEquals(1, $crawler->filter('div.invalid-feedback')->count());
+
+        $client->waitFor('.invalid-feedback');
+
+        $this->assertSelectorWillExist('#reps.is-invalid');
+        $this->assertSame('how many times did you lift this ?',  $crawler->filter('.invalid-feedback')->getText());
+        $client->takeScreenshot('./var/screenshots/add-lift-empty-form-reps.png');
     }
 
     public function testAddRepLogSuccess()
@@ -114,13 +115,21 @@ class AddRepLogTest extends PantherTestCase
         ];
         $crawler->filter('.js-new-rep-log-form')->form($values);
         $crawler->filter('.js-new-rep-log-form button')->click();
-        sleep(1);
 
-        $this->assertEquals(6, $crawler->filter('.js-rep-log-table tbody tr')->count());
+        $client->waitForVisibility('.swal2-modal');
+
+
+        $this->assertSame("Your lift have been added with success", $crawler->filter('.swal2-html-container')->getText());
+        $client->takeScreenshot('./var/screenshots/add-lift-success-modal.png');
+
+        $crawler->filter('.swal2-actions .swal2-confirm')->click();
+        $client->waitForInvisibility('.swal2-modal');
+
+        $this->assertEquals(4, $crawler->filter('.js-rep-log-table tbody tr')->count());
         $row = $crawler->filter('.js-rep-log-table tbody tr')->last();
         $this->assertEquals('Cat', $row->filter('td')->getElement(0)->getText());
         $this->assertEquals('5', $row->filter('td')->getElement(1)->getText());
         $this->assertEquals('45', $row->filter('td')->getElement(2)->getText());
+        $client->takeScreenshot('./var/screenshots/add-lift-success.png');
     }
-
 }
