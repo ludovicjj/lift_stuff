@@ -9,6 +9,7 @@
     --scroll-bar-color: #f1f1f1;
     --grey-color: #808080FF;
     --grey-light-color: #f7f7f7;
+    --nav-buttom-color: #dee2e6;
 
     --bs-gray-100: #f8f9fa;
     --bs-gray-200: #e9ecef;
@@ -24,11 +25,55 @@ body {
     background-color: var(--bs-gray-200);
     font-family: 'Mulish', sans-serif;
 }
-.container {
+.wrapper-flex {
+    display: flex;
+    flex-direction: row;
+}
+body > .wrapper-flex > .container {
     display: flex;
     flex-direction: column;
     height: 100vh;
 }
+/* NAVBAR */
+.navbar {
+    position: fixed;
+    background-color: var(--white-color);
+    height: 100vh;
+    align-items: flex-start;
+    padding: 0;
+}
+.navbar .wrapper-nav {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.navbar .wrapper-nav .navbar-items {
+    list-style: none;
+    padding: 0;
+}
+.navbar .wrapper-nav .brand {
+    color: var(--blue-color);
+    width: 72px;
+    height: 68px;
+    font-size: 2rem;
+    background-color: var(--white-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    border-bottom: 1px solid var(--nav-buttom-color);
+}
+.navbar .wrapper-nav .navbar-items {
+    width: 100%;
+}
+.navbar .wrapper-nav .navbar-items > li {
+    height: 68px;
+    border-bottom: 1px solid var(--nav-buttom-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+/* NAVBAR END */
 main {
     flex: 1 0 auto;
 }
