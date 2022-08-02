@@ -12,19 +12,12 @@ class RepLogApp {
             this.wrapper.querySelectorAll('.js-delete-rep-log').forEach(link => {
                 link.addEventListener('click', this.handleRepLogDelete.bind(this))
             })
-            // Row click
-            this.wrapper.querySelectorAll('tbody tr').forEach(row => {
-                row.addEventListener('click', this.handleRowClick)
-            })
         }).catch(error => {
             console.error('There was an error!', error);
         });
 
         // Add repLog
         this.form.addEventListener('submit', this.handleRepLogAdd.bind(this))
-    }
-
-    handleRowClick() {
     }
 
     async loadRepLogs() {
@@ -63,6 +56,10 @@ class RepLogApp {
         const submit = this.form.querySelector('button[type="submit"]');
         const submitText = submit.textContent;
 
+        // disable submit button and change text content
+        this.toggleDisabledButton(submit);
+        submit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
         const options = {
             method: 'POST',
             headers: {
@@ -76,8 +73,7 @@ class RepLogApp {
                 const isJson = response.headers.get('content-type')?.includes('application/json');
                 const data = isJson ? await response.json() : null;
 
-                this.toggleDisabledButton(submit);
-                submit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+                // Clear form errors
                 this.removeFormErrors();
 
                 // error
@@ -98,31 +94,44 @@ class RepLogApp {
                 const isJson = response.headers.get('content-type')?.includes('application/json');
                 const data = isJson ? await response.json() : null;
 
-                // Remove default row if rep table start with no data
-                if (this.isTbodyEmpty) {
-                    this.wrapper.querySelector('.default-row').remove();
-                    this.isTbodyEmpty = false;
+                if (response.ok) {
+                    // success alert
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success',
+                        text: 'Your lift have been added with success',
+                    })
+
+                    // Remove default row if rep table start with no data
+                    if (this.isTbodyEmpty) {
+                        this.wrapper.querySelector('.default-row').remove();
+                        this.isTbodyEmpty = false;
+                    }
+
+                    // Build and append new row
+                    const row = this.createRowFragment(data).querySelector('tr');
+                    this.wrapper.querySelector('tbody').appendChild(row);
+
+                    // Add Listener to new delete button
+                    const link = row.querySelector('.js-delete-rep-log');
+                    link.addEventListener('click', this.handleRepLogDelete.bind(this))
+
+                    this.updateTotalWeightLifted();
+                    this.updateTotalReps();
+
+                    // Clear field value
+                    this.clearForm();
                 }
-
-                // Build and append new row
-                const row = this.createRowFragment(data).querySelector('tr');
-                this.wrapper.querySelector('tbody').appendChild(row);
-
-                // Add Listener to new delete button
-                const link = row.querySelector('.js-delete-rep-log');
-                link.addEventListener('click', this.handleRepLogDelete.bind(this))
-
-                this.updateTotalWeightLifted();
-                this.updateTotalReps();
-
-                // Clear field value
-                this.clearForm();
             })
             .catch(error => {
                 if (error.code === 422) {
                     this.addFormErrors(error.errorsData);
                 } else {
-                    console.error(error.message);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: `Something went wrong! (${error.message})`,
+                    })
                 }
             })
             .finally(() => {
@@ -136,6 +145,35 @@ class RepLogApp {
     handleRepLogDelete(e) {
         e.preventDefault();
         const deleteBtn = e.currentTarget;
+        Swal.fire({
+            icon: 'question',
+            title: 'Delete',
+            text: 'Are you sure you want to delete this lift ?',
+            showCancelButton: true,
+            showLoaderOnConfirm: true,
+            preConfirm: () => {
+                return this.deleteRepLog(deleteBtn);
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Deleted!',
+                    text:'Your lift has been deleted.',
+                    icon:'success'
+                })
+            } else if (result.dismiss === Swal.DismissReason.cancel) {
+                console.log('cancel')
+            }
+        }).catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: `Something went wrong! (${error.message})`,
+            })
+        })
+    }
+
+    deleteRepLog(deleteBtn) {
         const deleteUrl = deleteBtn.getAttribute('data-url');
         const row = deleteBtn.closest('tr');
 
@@ -149,10 +187,13 @@ class RepLogApp {
             }
         }
 
-        fetch(deleteUrl, options)
+        return fetch(deleteUrl, options)
             .then(async response => {
                 const isJson = response.headers.get('content-type')?.includes('application/json');
                 const data = isJson ? await response.json() : null;
+                if (!response.ok) {
+                    this.sendError(data.message, data.code);
+                }
                 if (response.ok) {
                     row.classList.add('hide');
                     setTimeout(() => {
@@ -160,15 +201,14 @@ class RepLogApp {
                         this.updateTotalWeightLifted();
                         this.updateTotalReps();
                     }, 500);
-                } else {
-                    this.toggleDisabledButton(deleteBtn);
-                    this.toggleMotionToIcon(deleteBtn.querySelector('.fa-ban'), 'fa-spin');
-                    this.sendError(data.message, data.code);
                 }
-
             })
             .catch(error => {
-                console.error('There was an error!', error);
+                this.sendError(error.message, error.code);
+            })
+            .finally(() => {
+                this.toggleDisabledButton(deleteBtn);
+                this.toggleMotionToIcon(deleteBtn.querySelector('.fa-ban'), 'fa-spin');
             })
     }
 
