@@ -1,12 +1,22 @@
+{% set current_path = app.request.attributes.get('_route') %}
+
 <nav class="navbar">
     <div class="wrapper-nav">
-        <a class="brand" href="{{ path('home') }}" data-bs-title="Home" data-bs-placement="right" data-bs-toggle="tooltip">
+        <a class="brand">
             <i class="fa-solid fa-heart-pulse"></i>
+            <span>LiftStuff</span>
         </a>
         <ul class="navbar-items">
+            <li class="nav-item" data-bs-title="Home" data-bs-placement="right" data-bs-toggle="tooltip">
+                <a class="nav-link{% if (current_path == 'home') %} active{% endif %}" href="{{ path('home') }}">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Home</span>
+                </a>
+            </li>
             <li class="nav-item" data-bs-title="Logout" data-bs-placement="right" data-bs-toggle="tooltip">
                 <a class="nav-link" href="{{ path('logout') }}">
                     <i class="fa-solid fa-power-off"></i>
+                    <span>Logout</span>
                 </a>
             </li>
         </ul>
