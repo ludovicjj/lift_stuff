@@ -4,20 +4,27 @@ class RepLogApp {
      */
     constructor(wrapper) {
         this.wrapper = wrapper;
-        this.form = this.wrapper.querySelector('.js-new-rep-log-form');
+        this.helper = new helper(this.wrapper);
+        this.form = this.wrapper.querySelector(RepLogApp.selectors.repLogForm);
         this.isTbodyEmpty = false;
 
         // load RepLog
-        this.handleRepLogLoad().catch(error => {console.log(error.message)})
+        this.repLogLoad().catch(error => {console.log(error.message)})
         // Add RepLog
         this.form.addEventListener('submit', this.handleRepLogAdd.bind(this))
+    }
+
+    static get selectors() {
+        return {
+            repLogForm : '.js-new-rep-log-form',
+        }
     }
 
     /**
      * Fetch RepLogs and Update DOM
      * Add listener foreach delete link into each row
      */
-    async handleRepLogLoad() {
+    async repLogLoad() {
         const response = await fetch('/api/reps', {
             method: 'GET',
             headers: {
@@ -28,8 +35,9 @@ class RepLogApp {
 
         if (response.ok) {
             this.addRow(data)
-            this.updateTotalWeightLifted();
-            this.updateTotalReps();
+            this.helper.updateTotalWeightLifted();
+            this.helper.updateTotalReps()
+
             const deleteLinks =  this.wrapper.querySelectorAll('.js-delete-rep-log');
             deleteLinks.forEach(deleteLink => {
                 // add Listener for delete.
@@ -110,8 +118,8 @@ class RepLogApp {
                         link.addEventListener('click', this.handleRepLogDelete.bind(this))
                     }
 
-                    this.updateTotalWeightLifted();
-                    this.updateTotalReps();
+                    this.helper.updateTotalWeightLifted();
+                    this.helper.updateTotalReps();
 
                     // Clear field value
                     this.clearForm();
@@ -189,8 +197,8 @@ class RepLogApp {
                     row.classList.add('hide');
                     setTimeout(() => {
                         row.remove();
-                        this.updateTotalWeightLifted();
-                        this.updateTotalReps();
+                        this.helper.updateTotalWeightLifted();
+                        this.helper.updateTotalReps();
                     }, 500);
                 }
             })
@@ -202,33 +210,6 @@ class RepLogApp {
                 this.toggleDisabledButton(deleteBtn);
                 this.toggleMotionToIcon(deleteBtn.querySelector('.fa-ban'), 'fa-spin');
             })
-    }
-
-    /**
-     * Update the total weight lifted
-     */
-    updateTotalWeightLifted () {
-        let totalWeight = 0;
-        this.wrapper.querySelectorAll('tbody tr').forEach(function (row) {
-            if (row.getAttribute('data-weight')) {
-                totalWeight += parseFloat(row.getAttribute('data-weight'));
-            }
-        })
-
-        this.wrapper.querySelector('.js-total-weight').textContent = totalWeight.toString();
-    }
-
-    /**
-     * Update the total reps done
-     */
-    updateTotalReps() {
-        let totalReps = 0;
-        this.wrapper.querySelectorAll('tbody tr').forEach(function (row) {
-            if (row.getAttribute('data-reps')) {
-                totalReps += parseInt(row.getAttribute('data-reps'));
-            }
-        })
-        this.wrapper.querySelector('.js-total-reps').textContent = totalReps.toString();
     }
 
     removeFormErrors() {
@@ -385,6 +366,41 @@ class RepLogApp {
      */
     createElement(tagName) {
         return document.createElement(tagName)
+    }
+}
+class helper {
+    constructor(wrapper) {
+        this.wrapper = wrapper;
+    }
+
+    /**
+     *
+     * @param {string} attribute
+     * @return {string}
+     */
+    calculTotalDataAttribute(attribute) {
+        let total = 0;
+        this.wrapper.querySelectorAll('tbody tr').forEach(element => {
+            if (element.getAttribute(attribute)) {
+                total += parseFloat(element.getAttribute(attribute));
+            }
+        })
+
+        return total.toString();
+    }
+
+    /**
+     * Update the total weight lifted
+     */
+    updateTotalWeightLifted () {
+        this.wrapper.querySelector('.js-total-weight').textContent = this.calculTotalDataAttribute('data-weight');
+    }
+
+    /**
+     * Update the total reps done
+     */
+    updateTotalReps() {
+        this.wrapper.querySelector('.js-total-reps').textContent = this.calculTotalDataAttribute('data-reps');
     }
 }
 
