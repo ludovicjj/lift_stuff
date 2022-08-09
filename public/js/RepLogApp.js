@@ -21,7 +21,7 @@ class RepLogApp {
     }
 
     /**
-     * Fetch RepLogs and Update DOM
+     * Fetch RepLogs
      * Add listener foreach delete link into each row
      */
     async repLogLoad() {
@@ -31,18 +31,17 @@ class RepLogApp {
                 "X-Requested-With": "XMLHttpRequest",
             }
         });
-        const data = await this.getResponseData(response)
 
         if (response.ok) {
-            this.addRow(data)
+            let data = await response.json();
+            this.addRow(data);
             this.helper.updateTotalWeightLifted();
             this.helper.updateTotalReps()
 
             const deleteLinks =  this.wrapper.querySelectorAll('.js-delete-rep-log');
-            deleteLinks.forEach(deleteLink => {
-                // add Listener for delete.
+            for (let deleteLink of deleteLinks) {
                 deleteLink.addEventListener('click', this.handleRepLogDelete.bind(this))
-            })
+            }
         } else {
             const error = this.buildError('Failed to load items', response.status);
             return Promise.reject(error);
@@ -53,17 +52,17 @@ class RepLogApp {
      * Add One RepLog
      * Add listener to delete link into each row
      */
-    handleRepLogAdd(e) {
+     handleRepLogAdd(e) {
         e.preventDefault();
-        const formData = new FormData(this.form);
-        const json = JSON.stringify(Object.fromEntries(formData));
-        const url = this.form.getAttribute('action');
-        const submit = this.form.querySelector('button[type="submit"]');
-        const submitText = submit.textContent;
+        const formData = new FormData(this.form)
+        const json = JSON.stringify(Object.fromEntries(formData))
+        const url = this.form.getAttribute('action')
+        const submit = this.form.querySelector('button[type="submit"]')
+        const submitText = submit.textContent
 
         // disable submit button and change text content
-        this.toggleDisabledButton(submit);
-        submit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+        this.toggleDisabledButton(submit)
+        submit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>'
 
         const options = {
             method: 'POST',
@@ -73,75 +72,42 @@ class RepLogApp {
             },
             body: json
         };
-        fetch(url, options)
-            .then(async response => {
-                // Clear form errors
-                this.removeFormErrors();
 
-                // error
-                if (!response.ok) {
-                    const data = await this.getResponseData(response);
-                    const error = this.buildError(data?.message, data?.code, data?.errors);
-                    return Promise.reject(error);
-                }
+        fetch(url, options).then(async response => {
+            this.removeFormErrors()
 
-                return fetch(response.headers.get('Location'), {
-                    method: 'GET',
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest",
-                        'Accept': 'application/json'
-                    },
-                })
+            if (!response.ok) {
+                let jsonError = await response.json()
+                const error = this.buildError(jsonError?.message, jsonError?.code, jsonError?.errors)
+                return Promise.reject(error)
+            }
+            return fetch(response.headers.get('Location'), {
+                method: 'GET',
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    'Accept': 'application/json'
+                },
             })
-            .then(async response => {
-                if (response.ok) {
-                    // success alert
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Your lift have been added with success',
-                    })
-
-                    const data = await this.getResponseData(response);
-
-                    // Remove default row if rep table start with no data
-                    if (this.isTbodyEmpty) {
-                        this.wrapper.querySelector('.default-row').remove();
-                        this.isTbodyEmpty = false;
-                    }
-
-                    // Build and append new row
-                   const row = this.addRow(data);
-                    if (row) {
-                        // Add Listener to new delete button
-                        const link = row.querySelector('.js-delete-rep-log');
-                        link.addEventListener('click', this.handleRepLogDelete.bind(this))
-                    }
-
-                    this.helper.updateTotalWeightLifted();
-                    this.helper.updateTotalReps();
-
-                    // Clear field value
-                    this.clearForm();
-                }
-            })
-            .catch(error => {
-                if (error.code === 422) {
-                    this.addFormErrors(error.errorsData);
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: `Something went wrong! (${error.message})`,
-                    })
-                }
-            })
-            .finally(() => {
-                this.toggleDisabledButton(submit);
-                submit.textContent = submitText;
-            })
+        }).then(async response => {
+            let json = await response.json()
+            this.removeDefaultRowIfExist()
+            this.addRepLog(json);
+            Swal.fire({icon: 'success', title: 'Success', text: 'Your lift have been added with success'})
+        }).catch(e => {
+            if (e.code === 422) {
+                this.addFormErrors(e.errorsData)
+            } else {
+                Swal.fire({icon: 'error', title: 'Oops...', text: `Something went wrong! (${e.message})`})
+            }
+        }).finally(() => {
+            this.toggleDisabledButton(submit)
+            submit.textContent = submitText
+        })
     }
 
+    /**
+     * Delete One RepLog
+     */
     handleRepLogDelete(e) {
         e.preventDefault();
         const deleteBtn = e.currentTarget;
@@ -212,85 +178,80 @@ class RepLogApp {
             })
     }
 
+    addRepLog(data) {
+        let rowArray = this.addRow(data)
+        let link = rowArray[0].querySelector('.js-delete-rep-log');
+        link.addEventListener('click', this.handleRepLogDelete.bind(this));
+
+        this.helper.updateTotalWeightLifted();
+        this.helper.updateTotalReps();
+
+        this.form.reset();
+    }
+
     removeFormErrors() {
         const fields = this.form.querySelectorAll('input, select');
-
-        fields.forEach(function(field) {
+        for (let field of fields) {
             field.classList.remove('is-invalid');
             field.parentNode.querySelector('.invalid-feedback')?.remove();
-        });
+        }
+    }
+
+    removeDefaultRowIfExist() {
+        if (this.isTbodyEmpty) {
+            this.wrapper.querySelector('.default-row').remove();
+            this.isTbodyEmpty = false;
+        }
     }
 
     /**
      * @param {Object[]} errors
      */
     addFormErrors(errors) {
-        errors.forEach(({property, message})  => {
-            const field = this.form.querySelector(`[name="${property}"]`);
+        for (let {property, message} of errors) {
+            const field = this.form.querySelector(`[name="${property}"]`)
+
             if (field) {
-                field.classList.add('is-invalid');
-
-                const feedBack = this.createElement('div');
-                feedBack.classList.add('invalid-feedback');
-                feedBack.innerText = message;
-                field.after(feedBack);
+                field.classList.add('is-invalid')
+                const feedBack = this.createHTMLElement('div')
+                feedBack.classList.add('invalid-feedback')
+                feedBack.innerText = message
+                field.after(feedBack)
             }
-        });
-    }
-
-    clearForm() {
-        this.form.reset();
+        }
     }
 
     /**
-     * Create a row foreach items into data.
-     * Or create one default row if items into data is an empty array.
+     * Create and append row(s) using data
      *
-     * @param {Object} data Contain items
-     * @return {HTMLTableRowElement|null}
+     * @param {Object} data Row data
+     * @return {HTMLTableRowElement[]}
      */
     addRow(data) {
-        const isCollection = data?.items || false;
+        const target = this.wrapper.querySelector('tbody');
+        let isCollection = data?.items || false;
+        let rows = [];
 
         if(!isCollection) {
-            return this.createAndAppendRowFragment(data);
+            rows.push(this.createHTMLFragment(data));
         }
 
-        if (data.items.length === 0) {
+        if (isCollection && data.items.length === 0) {
             this.isTbodyEmpty = true;
-            this.createAndAppendRowFragment();
-            return null;
+            rows.push(this.createHTMLFragment());
         }
 
-        data.items.forEach(item => {
-            return this.createAndAppendRowFragment(item);
-        })
-    }
-
-    /**
-     * @param {Object|null} rowData
-     * @return {HTMLTableRowElement}
-     */
-    createAndAppendRowFragment(rowData = null) {
-        const template  = document.createElement('template');
-        const target = this.wrapper.querySelector('tbody');
-
-        if (rowData) {
-            const {item, reps, totalWeightLifted, links} = rowData;
-
-            template.innerHTML = `<tr data-weight="${totalWeightLifted}" data-reps="${reps}">
-            <td>${item}</td>
-            <td>${reps}</td>
-            <td>${totalWeightLifted}</td>
-            <td><a class="btn btn-blue btn-sm js-delete-rep-log" role="button" data-url="${links.self}"><i class="fa-solid fa-ban"></i></a></td>
-            </tr>`;
-        } else {
-            template.innerHTML = `<tr><td colspan="4" class="default-row">Let's start to lift something !</td></tr>`;
+        if (isCollection && data.items.length > 0) {
+            for (let item of data.items) {
+                rows.push(this.createHTMLFragment(item));
+            }
         }
 
-        const row = template.content.querySelector('tr')
-        target.appendChild(row);
-        return row;
+        for (let row of rows) {
+            target.appendChild(row)
+        }
+
+        return rows;
     }
 
     /**
@@ -364,27 +325,56 @@ class RepLogApp {
      * @param {string} tagName
      * @return {HTMLElement}
      */
-    createElement(tagName) {
+    createHTMLElement(tagName) {
         return document.createElement(tagName)
     }
+
+    /**
+     * @param {Object|null} rowData
+     * @return {HTMLTableRowElement}
+     */
+    createHTMLFragment(rowData = null) {
+        const template  = this.createHTMLElement('template');
+        const target = this.wrapper.querySelector('tbody');
+
+        if (rowData) {
+            const {item, reps, totalWeightLifted, links} = rowData;
+
+            template.innerHTML = `<tr data-weight="${totalWeightLifted}" data-reps="${reps}">
+            <td>${item}</td>
+            <td>${reps}</td>
+            <td>${totalWeightLifted}</td>
+            <td><a class="btn btn-blue btn-sm js-delete-rep-log" role="button" data-url="${links.self}"><i class="fa-solid fa-ban"></i></a></td>
+            </tr>`;
+
+
+        } else {
+            template.innerHTML = `<tr><td colspan="4" class="default-row">Let's start to lift something !</td></tr>`;
+        }
+        let row = template.content.querySelector('tr');
+        target.appendChild(row);
+        return row;
+    }
 }
+
 class helper {
     constructor(wrapper) {
         this.wrapper = wrapper;
     }
 
     /**
-     *
+     * Calcul total value of given data-attribute
      * @param {string} attribute
      * @return {string}
      */
     calculTotalDataAttribute(attribute) {
         let total = 0;
-        this.wrapper.querySelectorAll('tbody tr').forEach(element => {
+        const elements = this.wrapper.querySelectorAll('tbody tr');
+        for (let element of elements) {
             if (element.getAttribute(attribute)) {
                 total += parseFloat(element.getAttribute(attribute));
             }
-        })
+        }
 
         return total.toString();
     }
