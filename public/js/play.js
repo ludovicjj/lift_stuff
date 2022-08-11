@@ -18,13 +18,16 @@ for (let index in things) {
     //console.log(things[index]);
 }
 
-let foods = new Map();
-foods.set('italian', 'gelato');
-foods.set('mexican', 'tortas');
-foods.set('canadian', 'poutine');
+let foods = new WeakMap();
+foods.set(['italian'], 'gelato');
+foods.set(['mexican'], 'tortas');
+foods.set(['canadian'], 'poutine');
 
 let southernUsStates = ['Tennessee', 'Kentucky', 'Texas'];
 foods.set(southernUsStates, 'hot chicken');
-for (let [key, value] of foods) {
-    console.log(key, value)
-}
+southernUsStates = null
+
+console.log(
+    foods.get(['italian']), // undefined
+    foods.get(southernUsStates) // 'hot chicken'
+)
