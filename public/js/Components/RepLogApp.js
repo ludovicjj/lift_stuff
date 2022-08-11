@@ -1,5 +1,7 @@
 import Helper from './RepLogHelper.js'
 
+let HelperInstance = new WeakMap();
+
 class RepLogApp {
     /**
      * @param {HTMLElement} wrapper
@@ -7,7 +9,7 @@ class RepLogApp {
     constructor(wrapper) {
         this.wrapper = wrapper;
         this.repLogs = [];
-        this.helper = new Helper(this.repLogs)
+        HelperInstance.set(this, new Helper(this.repLogs));
         this.form = this.wrapper.querySelector(RepLogApp.selector.repLogForm);
 
         this.loadRepLogs();
@@ -159,7 +161,7 @@ class RepLogApp {
     }
 
     _updateTotalWeightAndReps() {
-        let {weight, reps} = this.helper.getTotalWeightAndRepsString();
+        let {weight, reps} = HelperInstance.get(this).getTotalWeightAndRepsString()
         this.wrapper.querySelector('.js-total-weight').textContent = weight;
         this.wrapper.querySelector('.js-total-reps').textContent = reps;
     }
