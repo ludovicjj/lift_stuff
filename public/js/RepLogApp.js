@@ -1,358 +1,255 @@
-class RepLogApp {
-    /**
-     * @param {HTMLElement} wrapper Div element contains table and form
-     */
-    constructor(wrapper) {
-        this.wrapper = wrapper;
-        this.form = this.wrapper.querySelector('.js-new-rep-log-form');
-        this.isTbodyEmpty = false;
+(function(window) {
+    let HelperInstance = new WeakMap();
 
-        this.loadRepLogs().then(() => {
-            // Delete repLog
-            this.wrapper.querySelectorAll('.js-delete-rep-log').forEach(link => {
-                link.addEventListener('click', this.handleRepLogDelete.bind(this))
-            })
-        }).catch(error => {
-            console.error('There was an error!', error);
-        });
+    class RepLogApp {
+        /**
+         * @param {HTMLElement} wrapper
+         */
+        constructor(wrapper) {
+            this.wrapper = wrapper;
+            this.repLogs = [];
+            HelperInstance.set(this, new Helper(this.repLogs));
+            this.form = this.wrapper.querySelector(RepLogApp.selector.repLogForm);
 
-        // Add repLog
-        this.form.addEventListener('submit', this.handleRepLogAdd.bind(this))
-    }
+            this.loadRepLogs();
 
-    async loadRepLogs() {
-        const response = await fetch('/api/reps', {
-            method: 'GET',
-            headers: {
-                "X-Requested-With": "XMLHttpRequest",
+            this.wrapper
+                .querySelector('tbody')
+                .addEventListener('click', this.handleRepLogDelete.bind(this))
+
+            this.form.addEventListener('submit', this.handleRepLogSubmit.bind(this))
+        }
+
+        static get selector() {
+            return {
+                repLogForm: '.js-new-rep-log-form',
+                repLogDeleteLink: '.js-delete-rep-log'
             }
-        });
-        const isJson = response.headers.get('content-type')?.includes('application/json');
-        const data = isJson ? await response.json() : null;
+        }
 
-        if (response.ok) {
-            if (response.status === 204) {
-                this.isTbodyEmpty = true;
-                const row = this.createDefaultRowFragment().querySelector('tr');
-                this.wrapper.querySelector('tbody').appendChild(row);
-            } else {
-                data.items.forEach((item) => {
-                    const row = this.createRowFragment(item).querySelector('tr');
-                    this.wrapper.querySelector('tbody').appendChild(row);
+        loadRepLogs() {
+            this.fetch('/api/reps', 'GET', {"Accept": "application/json"}).then(response => {
+                return response.json();
+            }).then(data => {
+                for (let repLog of data.items) {
+                    this._addRow(repLog);
+                }
+            })
+        }
+
+        handleRepLogDelete(e) {
+            e.preventDefault();
+            let link = e.target.closest(RepLogApp.selector.repLogDeleteLink)
+            if (link) {
+                Swal.fire({
+                    icon: 'question',
+                    title: 'Delete',
+                    text: 'Are you sure you want to delete this lift ?',
+                    showCancelButton: true,
+                    showLoaderOnConfirm: true,
+                    preConfirm: () => {
+                        return this.deleteRepLog(link);
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({title: 'Deleted!', text:'Your lift has been deleted.', icon:'success'})
+                    }
+                }).catch(error => {
+                    Swal.fire({icon: 'error', title: 'Oops...', text: `Something went wrong! (${error.message})`})
                 })
             }
-            this.updateTotalWeightLifted();
-            this.updateTotalReps();
-        } else {
-            return Promise.reject(response.status);
         }
-    }
 
-    handleRepLogAdd(e) {
-        e.preventDefault();
-        const formData = new FormData(this.form);
-        const json = JSON.stringify(Object.fromEntries(formData));
-        const url = this.form.getAttribute('action');
-        const submit = this.form.querySelector('button[type="submit"]');
-        const submitText = submit.textContent;
+        deleteRepLog(link) {
+            const deleteUrl = link.getAttribute('data-url');
+            const row = link.closest('tr');
+            const icon = link.querySelector('.fa-ban');
+            this._toggleSpinnerToIcon(icon);
 
-        // disable submit button and change text content
-        this.toggleDisabledButton(submit);
-        submit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
-
-        const options = {
-            method: 'POST',
-            headers: {
-                "X-Requested-With": "XMLHttpRequest",
-                'Content-Type': 'application/json'
-            },
-            body: json
-        };
-        fetch(url, options)
-            .then(async response => {
-                const isJson = response.headers.get('content-type')?.includes('application/json');
-                const data = isJson ? await response.json() : null;
-
-                // Clear form errors
-                this.removeFormErrors();
-
-                // error
+            return this.fetch(deleteUrl, 'DELETE').then(async response => {
                 if (!response.ok) {
-                    const error = this.buildError(data.message, data.code, data?.errors);
-                    return Promise.reject(error);
+                    let data = await response.json();
+                    this._sendError(data);
                 }
 
-                return fetch(response.headers.get('Location'), {
-                    method: 'GET',
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest",
-                        'Accept': 'application/json'
-                    },
-                })
+                row.classList.add('hide');
+                this.repLogs.splice(parseInt(row.getAttribute('data-key')), 1);
+                this._updateTotalWeightAndReps();
+                setTimeout(() => {
+                    row.remove();
+                },500)
+            }).finally(() => {
+                this._toggleSpinnerToIcon(icon);
             })
-            .then(async response => {
-                const isJson = response.headers.get('content-type')?.includes('application/json');
-                const data = isJson ? await response.json() : null;
+        }
 
-                if (response.ok) {
-                    // success alert
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Success',
-                        text: 'Your lift have been added with success',
-                    })
+        handleRepLogSubmit(e) {
+            e.preventDefault();
+            const formData = new FormData(this.form)
+            const formSubmitButton = this.form.querySelector('button[type="submit"]')
+            const formJson = JSON.stringify(Object.fromEntries(formData))
 
-                    // Remove default row if rep table start with no data
-                    if (this.isTbodyEmpty) {
-                        this.wrapper.querySelector('.default-row').remove();
-                        this.isTbodyEmpty = false;
+            this._toggleDisabledButton(formSubmitButton);
+            this._removeFormErrors()
+
+            this._submitRepLog(formJson)
+                .then(data => {
+                    this._addRow(data);
+                    this.form.reset();
+                    Swal.fire({icon: 'success', title: 'Success', text: 'Your lift have been added with success'})
+                }).catch(error => {
+                if (error.code === 422) {
+                    this._mapErrorsToForm(error.errorsData)
+                } else {
+                    Swal.fire({icon: 'error', title: 'Oops...', text: `Something went wrong! (${error.message})`})
+                }
+            }).finally(() => {
+                this._toggleDisabledButton(formSubmitButton)
+            })
+        }
+
+        _submitRepLog(data) {
+            const url = this.form.getAttribute('action')
+
+            return this.fetch(url, 'POST', {'Content-Type': 'application/json'}, data)
+                .then(async response => {
+                    if (!response.ok) {
+                        let data = await response.json();
+                        this._sendError(data);
                     }
 
-                    // Build and append new row
-                    const row = this.createRowFragment(data).querySelector('tr');
-                    this.wrapper.querySelector('tbody').appendChild(row);
+                    return this.fetch(response.headers.get('Location'), 'GET', {'accept': 'application/json'})
 
-                    // Add Listener to new delete button
-                    const link = row.querySelector('.js-delete-rep-log');
-                    link.addEventListener('click', this.handleRepLogDelete.bind(this))
-
-                    this.updateTotalWeightLifted();
-                    this.updateTotalReps();
-
-                    // Clear field value
-                    this.clearForm();
-                }
-            })
-            .catch(error => {
-                if (error.code === 422) {
-                    this.addFormErrors(error.errorsData);
-                } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: `Something went wrong! (${error.message})`,
-                    })
-                }
-            })
-            .finally(() => {
-                setTimeout(() => {
-                    this.toggleDisabledButton(submit);
-                    submit.textContent = submitText;
-                }, 300)
-            })
-    }
-
-    handleRepLogDelete(e) {
-        e.preventDefault();
-        const deleteBtn = e.currentTarget;
-        Swal.fire({
-            icon: 'question',
-            title: 'Delete',
-            text: 'Are you sure you want to delete this lift ?',
-            showCancelButton: true,
-            showLoaderOnConfirm: true,
-            preConfirm: () => {
-                return this.deleteRepLog(deleteBtn);
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                Swal.fire({
-                    title: 'Deleted!',
-                    text:'Your lift has been deleted.',
-                    icon:'success'
+                }).then(async response => {
+                    return await response.json();
                 })
-            } else if (result.dismiss === Swal.DismissReason.cancel) {
-                console.log('cancel')
-            }
-        }).catch(error => {
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: `Something went wrong! (${error.message})`,
-            })
-        })
-    }
-
-    deleteRepLog(deleteBtn) {
-        const deleteUrl = deleteBtn.getAttribute('data-url');
-        const row = deleteBtn.closest('tr');
-
-        this.toggleDisabledButton(deleteBtn);
-        this.toggleMotionToIcon(deleteBtn.querySelector('.fa-ban'), 'fa-spin');
-
-        const options = {
-            method: "DELETE",
-            headers: {
-                "X-Requested-With": "XMLHttpRequest"
-            }
         }
 
-        return fetch(deleteUrl, options)
-            .then(async response => {
-                const isJson = response.headers.get('content-type')?.includes('application/json');
-                const data = isJson ? await response.json() : null;
-                if (!response.ok) {
-                    this.sendError(data.message, data.code);
+        _mapErrorsToForm(errors) {
+            for (let {property, message} of errors) {
+                const field = this.form.querySelector(`[name="${property}"]`)
+
+                if (field) {
+                    field.classList.add('is-invalid')
+                    const feedBack = document.createElement('div')
+                    feedBack.classList.add('invalid-feedback')
+                    feedBack.innerText = message
+                    field.after(feedBack)
                 }
-                if (response.ok) {
-                    row.classList.add('hide');
-                    setTimeout(() => {
-                        row.remove();
-                        this.updateTotalWeightLifted();
-                        this.updateTotalReps();
-                    }, 500);
+            }
+        }
+
+        _removeFormErrors() {
+            const fields = this.form.querySelectorAll('input, select');
+            for (let field of fields) {
+                field.classList.remove('is-invalid');
+                field.parentNode.querySelector('.invalid-feedback')?.remove();
+            }
+        }
+
+        _addRow(repLog) {
+            this.repLogs.push(repLog);
+            const htmlFragment = rowFragment(repLog);
+            const row = htmlFragment.content.querySelector('tr');
+
+            // store the repLog index into data-key attribute
+            row.setAttribute('data-key', (this.repLogs.length - 1).toString());
+
+            this.wrapper.querySelector('tbody').appendChild(row)
+            this._updateTotalWeightAndReps();
+        }
+
+        _updateTotalWeightAndReps() {
+            let {weight, reps} = HelperInstance.get(this).getTotalWeightAndRepsString()
+            this.wrapper.querySelector('.js-total-weight').textContent = weight;
+            this.wrapper.querySelector('.js-total-reps').textContent = reps;
+        }
+
+        /**
+         * @return {Promise<Response>}
+         */
+        fetch(url, method, headersOptions = {}, body) {
+            const headers = Object.assign({}, {
+                "X-Requested-With": "XMLHttpRequest",
+            }, headersOptions)
+
+            if (method === "POST" && body !== undefined) {
+                return fetch(url, {method, headers, body})
+            }
+
+            return fetch(url, {method, headers})
+        }
+
+        _toggleSpinnerToIcon(icon) {
+            icon.classList.toggle('fa-spin')
+        }
+
+        _toggleDisabledButton(button) {
+            button.classList.toggle('disabled');
+            let isButton = button.nodeName === 'BUTTON'
+            if (button.classList.contains('disabled')) {
+                button.setAttribute('aria-disabled', 'true');
+                if (isButton) {
+                    button.setAttribute('tabindex', '-1');
                 }
-            })
-            .catch(error => {
-                this.sendError(error.message, error.code);
-            })
-            .finally(() => {
-                this.toggleDisabledButton(deleteBtn);
-                this.toggleMotionToIcon(deleteBtn.querySelector('.fa-ban'), 'fa-spin');
-            })
-    }
-
-    updateTotalWeightLifted () {
-        let totalWeight = 0;
-        this.wrapper.querySelectorAll('tbody tr').forEach(function (row) {
-            if (row.getAttribute('data-weight')) {
-                totalWeight += parseFloat(row.getAttribute('data-weight'));
+            } else {
+                button.removeAttribute('aria-disabled');
+                if (isButton) {
+                    button.removeAttribute('tabindex');
+                }
             }
-        })
 
-        this.wrapper.querySelector('.js-total-weight').textContent = totalWeight.toString();
-    }
-
-    updateTotalReps() {
-        let totalReps = 0;
-        this.wrapper.querySelectorAll('tbody tr').forEach(function (row) {
-            if (row.getAttribute('data-reps')) {
-                totalReps += parseInt(row.getAttribute('data-reps'));
-            }
-        })
-        this.wrapper.querySelector('.js-total-reps').textContent = totalReps.toString();
-    }
-
-    removeFormErrors() {
-        const fields = this.form.querySelectorAll('input, select');
-
-        fields.forEach(function(field) {
-            field.classList.remove('is-invalid');
-            field.parentNode.querySelector('.invalid-feedback')?.remove();
-        });
-    }
-
-    /**
-     * @param {Object[]} errors
-     */
-    addFormErrors(errors) {
-        errors.forEach(({property, message})  => {
-            const field = this.form.querySelector(`[name="${property}"]`);
-            if (field) {
-                field.classList.add('is-invalid');
-
-                const feedBack = this.createElement('div');
-                feedBack.classList.add('invalid-feedback');
-                feedBack.innerText = message;
-                field.after(feedBack);
-            }
-        });
-    }
-
-    clearForm() {
-        this.form.reset();
-    }
-
-    /**
-     * @param {number} id
-     * @param {string} item
-     * @param {number} reps
-     * @param {number} totalWeightLifted
-     * @param {Object} links
-     * @return {DocumentFragment}
-     */
-    createRowFragment({id, item, reps, totalWeightLifted, links}) {
-        const template  = document.createElement('template');
-        template.innerHTML = `<tr data-weight="${totalWeightLifted}" data-reps="${reps}">
-            <td>${item}</td>
-            <td>${reps}</td>
-            <td>${totalWeightLifted}</td>
-            <td><a class="btn btn-blue btn-sm js-delete-rep-log" role="button" data-url="${links.self}"><i class="fa-solid fa-ban"></i></a></td>
-        </tr>`;
-        return template.content;
-    }
-
-    createDefaultRowFragment() {
-        const template  = document.createElement('template');
-        template.innerHTML = `<tr><td colspan="4" class="default-row">Let's start to lift something !</td></tr>`;
-        return template.content;
-    }
-
-    /**
-     * Disabled or enable bootstrap button
-     * @param {HTMLElement} button
-     */
-    toggleDisabledButton(button) {
-        button.classList.toggle('disabled');
-        let isButton = button.nodeName === 'BUTTON'
-        if (button.classList.contains('disabled')) {
-            button.setAttribute('aria-disabled', 'true');
-            if (isButton) {
-                button.setAttribute('tabindex', '-1');
-            }
-        } else {
-            button.removeAttribute('aria-disabled');
-            if (isButton) {
-                button.removeAttribute('tabindex');
-            }
         }
 
+        _sendError({message = '', code = 0, errors = []}) {
+            const errorResponse = {
+                type: 'Error',
+                message: message || 'Something went wrong',
+                code: code || 400,
+                errorsData: errors
+            }
+
+            throw (errorResponse);
+        }
     }
 
-    /**
-     * @param {HTMLElement} icon
-     * @param {string} motion
-     */
-    toggleMotionToIcon(icon, motion) {
-        icon.classList.toggle(motion)
-    }
-
-    /**
-     * @param {string} message the error message
-     * @param {number} code the error status code, default is 400
-     */
-    sendError(message = '', code = 0) {
-        const errorResponse = {
-            type: 'Error',
-            message: message || 'Something went wrong',
-            'code': code || 400
+    class Helper {
+        constructor(repLogs) {
+            this.repLogs = repLogs;
         }
 
-        throw (errorResponse);
+        calculTotalWeightAndReps(repLogs) {
+            let total = {weight: 0, reps: 0};
+            for (let {reps, totalWeightLifted} of repLogs) {
+                total.reps += reps
+                total.weight += totalWeightLifted
+            }
+            return total;
+        }
+
+        getTotalWeightAndRepsString() {
+            let totalObject = this.calculTotalWeightAndReps(this.repLogs);
+
+            for (let [key, value] of Object.entries(totalObject)) {
+                totalObject[key] = value.toString()
+            }
+            return totalObject;
+        }
+    }
+    const rowFragment = (repLog) => {
+        const template = document.createElement('template');
+        template.innerHTML = `<tr data-weight="${repLog.totalWeightLifted}" data-reps="${repLog.reps}">
+    <td>${repLog.item}</td>
+    <td>${repLog.reps}</td>
+    <td>${repLog.totalWeightLifted}</td>
+    <td>
+        <a class="btn btn-blue btn-sm js-delete-rep-log" role="button" data-url="${repLog.links.self}">
+            <i class="fa-solid fa-ban"></i>
+        </a>
+    </td>
+    </tr>`;
+        return template;
     }
 
-    /**
-     * @param {string} message the error message
-     * @param {number} code the error status code, default is 400
-     * @param {[]|Object[]} errorsData the errors data returned
-     * @return {Object} the error object
-     */
-    buildError(message = '', code = 0, errorsData = []) {
-        return {
-            type: 'Error',
-            message: message || 'Something went wrong',
-            errorsData: errorsData,
-            code: code || 400
-        };
-    }
-
-    /**
-     * @param {string} tagName
-     * @return {HTMLElement}
-     */
-    createElement(tagName) {
-        return document.createElement(tagName)
-    }
-}
-
-new RepLogApp(document.querySelector('.js-rep-log-table'));
+    window.RepLogApp = RepLogApp;
+})(window)

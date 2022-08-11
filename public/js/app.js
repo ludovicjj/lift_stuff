@@ -10,13 +10,14 @@ if (window.sessionStorage?.menu && window.sessionStorage.menu === 'show') {
     navBar.classList.add('active');
 }
 
-showMenu.addEventListener('click', () => {
-    navBar.style.transition = null;
-    navBar.classList.toggle('active');
-    if (navBar.classList.contains('active')) {
-        window.sessionStorage.setItem('menu', 'show')
-    } else {
-        window.sessionStorage.removeItem('menu')
-    }
-
-})
+if (showMenu) {
+    showMenu.addEventListener('click', () => {
+        navBar.style.transition = null;
+        navBar.classList.toggle('active');
+        if (navBar.classList.contains('active')) {
+            window.sessionStorage.setItem('menu', 'show')
+        } else {
+            window.sessionStorage.removeItem('menu')
+        }
+    })
+}
