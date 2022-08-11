@@ -8,7 +8,13 @@
 {% block javascripts %}
     {{ parent() }}
     <script src="{{ asset('js/home.js') }}" defer></script>
-    <script src="{{ asset('js/repLog.js') }}" type="module" defer></script>
+    <script src="{{ asset('dist/RepLogApp.js') }}" defer></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let wrapper = document.querySelector('.js-rep-log-table');
+            new RepLogApp(wrapper)
+        });
+    </script>
 {% endblock %}
 
 {% block body %}
