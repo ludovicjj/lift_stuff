@@ -1,3 +1,6 @@
+'use strict';
+const Helper = require('./Components/RepLogHelper');
+
 (function(window) {
     let HelperInstance = new WeakMap();
 
@@ -213,29 +216,7 @@
         }
     }
 
-    class Helper {
-        constructor(repLogs) {
-            this.repLogs = repLogs;
-        }
 
-        calculTotalWeightAndReps(repLogs) {
-            let total = {weight: 0, reps: 0};
-            for (let {reps, totalWeightLifted} of repLogs) {
-                total.reps += reps
-                total.weight += totalWeightLifted
-            }
-            return total;
-        }
-
-        getTotalWeightAndRepsString() {
-            let totalObject = this.calculTotalWeightAndReps(this.repLogs);
-
-            for (let [key, value] of Object.entries(totalObject)) {
-                totalObject[key] = value.toString()
-            }
-            return totalObject;
-        }
-    }
     const rowFragment = (repLog) => {
         const template = document.createElement('template');
         template.innerHTML = `<tr data-weight="${repLog.totalWeightLifted}" data-reps="${repLog.reps}">
