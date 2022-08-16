@@ -151,49 +151,39 @@ form.js-new-rep-log-form .row .col:last-child {
 .panel-wrapper .panel table tbody td:last-child{
     border-radius: 0 10px  10px 0;
 }
-/* leaderboard accordion */
+/* leaderboard ACCORDION */
 /* Style the buttons that are used to open and close the accordion panel */
 .accordion-btn {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 1rem 2rem;
     background-color: var(--blue-color);
     color: var(--white-color);
     border-radius: .375rem;
-    cursor: pointer;
-    padding: 1rem 2rem;
     border: 1px solid rgba(0,0,0,.175);
-    width: 100%;
-    text-align: left;
+    cursor: pointer;
     transition: border-radius .3s;
-    display: flex;
-    justify-content: space-between;
 }
-.accordion-btn:focus {
-    box-shadow: none;
-}
-.accordion-custom.show .accordion-btn{
+.accordion-container.show .accordion-btn{
     border-radius: .375rem .375rem 0 0;
-}
-.accordion-btn i {
-    transition: transform .3s;
-}
-.accordion-btn:hover {
-    background-color: var(--blue-hover-color);
-    border: 1px var(--blue-hover-color) solid;
 }
 .accordion-btn.active {
     border-radius: .375rem .375rem 0 0;
 }
-.accordion-custom.show .accordion-btn.active {
+.accordion-container.show .accordion-btn.active {
     border-radius: .375rem;
 }
 /* Style the accordion panel. Note: hidden by default */
-.panel-wrapper {
+.accordion-container .panel-wrapper {
     padding: 0 2rem;
     background-color: var(--white-color);
     max-height: 0;
     overflow: hidden;
     transition: max-height .3s ease-out;
 }
-.accordion-custom.show .panel-wrapper {
+.accordion-container.show .panel-wrapper {
     max-height: fit-content;
 }
 .panel {
@@ -202,7 +192,16 @@ form.js-new-rep-log-form .row .col:last-child {
 .panel .table-responsive {
     max-height: 265px;
 }
-
+.accordion-btn i {
+    transition: transform .3s;
+}
+.accordion-btn:hover {
+    background-color: var(--blue-hover-color);
+    border: 1px var(--blue-hover-color) solid;
+}
+.accordion-btn:focus {
+    box-shadow: none;
+}
 /* style for screen >= 576px */
 @media (min-width: 576px) {
     form.js-new-rep-log-form .row {
