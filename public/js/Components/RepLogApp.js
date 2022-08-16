@@ -1,5 +1,5 @@
-import Helper from './RepLogHelper.js'
-
+const Helper = require('./RepLogHelper');
+const Swal = require('sweetalert2');
 let HelperInstance = new WeakMap();
 
 class RepLogApp {
@@ -99,14 +99,14 @@ class RepLogApp {
                 this.form.reset();
                 Swal.fire({icon: 'success', title: 'Success', text: 'Your lift have been added with success'})
             }).catch(error => {
-                if (error.code === 422) {
-                    this._mapErrorsToForm(error.errorsData)
-                } else {
-                    Swal.fire({icon: 'error', title: 'Oops...', text: `Something went wrong! (${error.message})`})
-                }
-            }).finally(() => {
-                this._toggleDisabledButton(formSubmitButton)
-            })
+            if (error.code === 422) {
+                this._mapErrorsToForm(error.errorsData)
+            } else {
+                Swal.fire({icon: 'error', title: 'Oops...', text: `Something went wrong! (${error.message})`})
+            }
+        }).finally(() => {
+            this._toggleDisabledButton(formSubmitButton)
+        })
     }
 
     _submitRepLog(data) {
@@ -217,16 +217,16 @@ class RepLogApp {
 const rowFragment = (repLog) => {
     const template = document.createElement('template');
     template.innerHTML = `<tr data-weight="${repLog.totalWeightLifted}" data-reps="${repLog.reps}">
-    <td>${repLog.item}</td>
-    <td>${repLog.reps}</td>
-    <td>${repLog.totalWeightLifted}</td>
-    <td>
-        <a class="btn btn-blue btn-sm js-delete-rep-log" role="button" data-url="${repLog.links.self}">
-            <i class="fa-solid fa-ban"></i>
-        </a>
-    </td>
-    </tr>`;
+<td>${repLog.item}</td>
+<td>${repLog.reps}</td>
+<td>${repLog.totalWeightLifted}</td>
+<td>
+    <a class="btn btn-blue btn-sm js-delete-rep-log" role="button" data-url="${repLog.links.self}">
+        <i class="fa-solid fa-ban"></i>
+    </a>
+</td>
+</tr>`;
     return template;
 }
 
-export default RepLogApp;
+module.exports = RepLogApp;
