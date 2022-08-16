@@ -1,3 +1,4 @@
+const bootstrap = require('bootstrap')
 class Modal {
     /**
      * @param {HTMLElement} link
