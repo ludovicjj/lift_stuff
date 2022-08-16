@@ -34,6 +34,7 @@ module.exports = {
                     'css-loader'
                 ]
             },
+            // https://webpack.js.org/guides/asset-modules/#resource-assets
             {
                 test: /\.(png|jpg|jpeg|gif|ico|svg)$/,
                 type: 'asset/resource'
