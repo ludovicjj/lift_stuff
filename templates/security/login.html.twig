@@ -1,9 +1,10 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}Login{% endblock %}
-{% block stylesheets %}
+
+{% block javascripts %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+    <script src="{{ asset('build/login.js') }}" defer></script>
 {% endblock %}
 
 {% block body %}
@@ -11,7 +12,8 @@
         <div class="card-img" style="background-image: url({{ image_url }})">
             <div class="author">
                 <span>{{ author_name }}</span>
-                <img alt="author_avatar" src="{{ author_avatar }}">
+{#                <img alt="author_avatar" src="{{ author_avatar }}">#}
+                <div class="author_avatar"></div>
             </div>
         </div>
         <div class="card-body">

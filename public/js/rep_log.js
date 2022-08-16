@@ -1,6 +1,7 @@
 const RepLogApp = require('./Components/RepLogApp');
 const Modal = require('./Components/Modal');
 const Accordion = require('./Components/Accordion');
+require('../css/home.css');
 
 let wrapper = document.querySelector('.js-rep-log-table');
 new RepLogApp(wrapper);

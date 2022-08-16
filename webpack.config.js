@@ -4,11 +4,13 @@ module.exports = {
     entry: {
         rep_log: "./public/js/rep_log.js",
         menu: "./public/js/menu.js",
-        tooltip: "./public/js/tooltip.js"
+        main: "./public/js/main.js",
+        login: "./public/js/login.js"
     },
     output: {
         path: path.resolve(__dirname, "public", "build"),
-        filename: "[name].js"
+        filename: "[name].js",
+        assetModuleFilename: 'images/[hash][ext][query]'
     },
     module: {
         rules: [
@@ -24,6 +26,17 @@ module.exports = {
                         cacheDirectory: true
                     }
                 }
+            },
+            {
+                test: /\.css$/,
+                use: [
+                    'style-loader',
+                    'css-loader'
+                ]
+            },
+            {
+                test: /\.(png|jpg|jpeg|gif|ico|svg)$/,
+                type: 'asset/resource'
             }
         ]
     }
