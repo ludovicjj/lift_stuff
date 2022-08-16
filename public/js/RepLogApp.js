@@ -1,5 +1,6 @@
 'use strict';
 const Helper = require('./Components/RepLogHelper');
+const Swal = require('sweetalert2');
 
 (function(window) {
     let HelperInstance = new WeakMap();
