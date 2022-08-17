@@ -10,7 +10,7 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, "public", "build"),
         filename: "[name].js",
-        assetModuleFilename: 'images/[hash][ext][query]'
+        assetModuleFilename: 'asset/[hash][ext][query]'
     },
     module: {
         rules: [
@@ -23,7 +23,7 @@ module.exports = {
                         presets: [
                             ['@babel/preset-env', { targets: "defaults" }]
                         ],
-                        cacheDirectory: false
+                        cacheDirectory: true
                     }
                 }
             },
@@ -36,11 +36,17 @@ module.exports = {
             },
             {
                 test: /\.(png|jpg|jpeg|gif|ico|svg)$/,
-                type: 'asset/resource'
+                type: 'asset/resource',
+                generator: {
+                    filename: 'images/[name]-[hash:6][ext][query]'
+                }
             },
             {
                 test: /\.(woff|woff2|eot|ttf|otf)$/i,
                 type: 'asset/resource',
+                generator: {
+                    filename: 'fonts/[hash:6][ext][query]'
+                }
             },
         ]
     }
