@@ -20,10 +20,10 @@
 // }
 const nav = document.querySelector('.navbar');
 const content = document.querySelector('.container-content');
-const li = document.querySelector('.navbar-toggle');
-if (nav) {
-    const span = li.querySelector('span');
-    li.addEventListener('click', function (e) {
+const navToggleLink = document.querySelector('a.navbar-toggle-link');
+if (navToggleLink) {
+    const span = navToggleLink.querySelector('span');
+    navToggleLink.addEventListener('click', function (e) {
         e.preventDefault();
         nav.classList.toggle('active');
 

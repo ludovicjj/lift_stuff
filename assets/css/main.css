@@ -107,6 +107,11 @@ body > .wrapper-flex > .container {
 
 .navbar ul li .navbar-helper {
     padding-left: 15px;
+    opacity: 0;
+    transition: 0.5s;
+}
+.navbar.active ul li .navbar-helper {
+    opacity: 1;
 }
 .navbar ul li .navbar-icon {
     min-width: var(--nav-link-weight);
