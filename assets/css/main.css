@@ -64,7 +64,7 @@ body > .wrapper-flex > .container {
     margin: 0;
     padding: 0;
     transition: width .5s;
-    box-shadow: 0.125em 0 0.5em rgba(0, 0, 0, 0.5);
+    box-shadow: 0.125em 0 0.5em rgba(0, 0, 0, 0.14);
 }
 .navbar.active {
     width: 170px;

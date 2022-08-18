@@ -172,6 +172,9 @@ form.js-new-rep-log-form .row .col:last-child {
 }
 
 /* leaderboard table */
+.panel-wrapper {
+    border: 1px solid var(--bs-border-color-translucent);
+}
 .panel-wrapper .panel table {
     border-collapse: separate;
     border-spacing: 0 10px;
