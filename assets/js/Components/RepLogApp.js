@@ -221,7 +221,7 @@ const rowFragment = (repLog) => {
 <td>${repLog.reps}</td>
 <td>${repLog.totalWeightLifted}</td>
 <td>
-    <a class="btn btn-blue btn-sm js-delete-rep-log" role="button" data-url="${repLog.links.self}">
+    <a class="btn btn-yellow btn-sm js-delete-rep-log" role="button" data-url="${repLog.links.self}">
         <i class="fa-solid fa-ban"></i>
     </a>
 </td>

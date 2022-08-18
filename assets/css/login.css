@@ -55,7 +55,7 @@ main {
     justify-content: center;
 }
 .card-body h5 {
-    color: var(--sand-color);
+    color: var(--main-color);
 }
 
 .wrapper-login-action {

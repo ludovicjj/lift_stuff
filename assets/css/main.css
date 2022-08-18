@@ -7,8 +7,11 @@
     --sand-dark-color: #ce9975;
     --white-color: #fff;
     --black-color: #000000;
-    --blue-color: #2A265F;
-    --blue-hover-color: #7271bb;
+    /*--blue-color: #2A265F;*/
+    /*--blue-hover-color: #7271bb;*/
+    --main-color: #e9b957;
+    --main-hover-color: #c79231;
+
     --blue-hover-rbga-color: rgba(114, 113, 187, .25);
     --scroll-bar-color: #f1f1f1;
     --grey-color: #808080FF;
@@ -70,7 +73,7 @@ body > .wrapper-flex > .container {
     margin: 0;
     padding: 0;
     list-style: none;
-    color: var(--blue-hover-color);
+    color: var(--main-color);
     width: 100%;
 }
 .navbar ul li:not(:last-child) {
@@ -98,7 +101,7 @@ body > .wrapper-flex > .container {
 }
 .navbar ul li a:hover,
 .navbar ul li a.current {
-    background-color: var(--blue-hover-color);
+    background-color: var(--main-color);
     color: var(--white-color);
 }
 
@@ -132,40 +135,30 @@ main {
     min-height: 100vh;
 }
 
-.btn-custom {
-    background-color: var(--sand-color);
+.btn-yellow {
+    background-color: var(--main-color);
     color: var(--white-color);
 }
-.btn-blue {
-    background-color: var(--blue-color);
-    border: 1px solid var(--blue-color);
-    color: var(--white-color);
-}
-.btn-outline-custom {
-    color: var(--sand-color);
-    border: 1px var(--sand-color) solid;
+.btn-outline-yellow {
+    color: var(--main-color);
+    border: 1px var(--main-color) solid;
 }
 
 /* hover, active , focus */
-.btn-outline-custom:hover, .btn-outline-custom:active, .btn-outline-custom:focus{
-    background-color: var(--sand-dark-color);
+.btn-outline-yellow:hover, .btn-outline-yellow:active, .btn-outline-yellow:focus{
+    background-color: var(--main-hover-color);
     color: var(--white-color);
-    border: 1px var(--sand-dark-color) solid;
+    border: 1px var(--main-hover-color) solid;
 }
 
-.btn-custom:hover, .btn-custom:active, .btn-custom:focus{
-    border: 1px var(--sand-dark-color) solid;
-    background-color: var(--sand-dark-color);
+.btn-yellow:hover, .btn-yellow:active, .btn-yellow:focus {
+    background-color: var(--main-hover-color);
+    border: 1px solid var(--main-hover-color);
     color: var(--white-color);
 }
-.btn-blue:hover, .btn-blue:active, .btn-blue:focus {
-    background-color: var(--blue-hover-color);
-    border: 1px solid var(--blue-hover-color);
-    color: var(--white-color);
-}
-.btn-blue[type="submit"]:active, .btn-blue[type="submit"]:focus {
-    background-color: var(--blue-color);
-    border: 1px solid var(--blue-color);
+.btn-yellow[type="submit"]:active, .btn-yellow[type="submit"]:focus {
+    background-color: var(--main-color);
+    border: 1px solid var(--main-color);
     color: var(--white-color);
 }
 
@@ -186,17 +179,17 @@ main {
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background:var(--blue-color);
+    background:var(--main-color);
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background: var(--blue-hover-color);
+    background: var(--main-hover-color);
 }
 .table-responsive {
     padding-right: 5px;
     /*overflow-y: scroll;*/
-    scrollbar-color: var(--blue-color) #c9c8c8;
+    scrollbar-color: var(--main-color) #c9c8c8;
     scrollbar-width: thin;
 }
 
