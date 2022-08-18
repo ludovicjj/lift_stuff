@@ -2,10 +2,10 @@ const path = require('path')
 module.exports = {
     mode: "development",
     entry: {
-        rep_log: "./public/js/rep_log.js",
-        menu: "./public/js/menu.js",
-        main: "./public/js/main.js",
-        login: "./public/js/login.js"
+        rep_log: "./assets/js/rep_log.js",
+        menu: "./assets/js/menu.js",
+        main: "./assets/js/main.js",
+        login: "./assets/js/login.js"
     },
     output: {
         path: path.resolve(__dirname, "public", "build"),
