@@ -11,8 +11,8 @@
         {% endblock %}
 
         {% block javascripts %}
-            <script src="{{ asset('build/menu.js') }}" defer></script>
             <script src="{{ asset('build/main.js') }}" defer></script>
+            <script src="{{ asset('build/menu.js') }}" defer></script>
             {#{{ encore_entry_script_tags('app') }}#}
         {% endblock %}
     </head>
@@ -21,7 +21,7 @@
         {% if app.user %}
             {{ include('components/menu.html.twig') }}
         {% endif %}
-        <div class="container {% if app.user %}container-lg{% endif %}">
+        <div class="container {% if app.user %}container-content{% endif %}">
             <main>
                 {# read and display all flash messages #}
                 {% for label, messages in app.flashes %}
