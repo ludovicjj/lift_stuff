@@ -62,7 +62,7 @@ form.js-new-rep-log-form .row .col:last-child {
     display: flex;
 }
 .card-reps .card-content table td {
- color: var(--grey-color);
+    color: var(--grey-color);
 }
 .card-reps .card-content table tbody tr {
     margin-bottom: 10px;
@@ -115,23 +115,62 @@ form.js-new-rep-log-form .row .col:last-child {
 }
 
 /******* Modal Items Info *********/
+#itemInfoModal .modal-content {
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+}
+#itemInfoModal .modal-content .modal-header {
+    padding: 0;
+    border-radius: 0.5rem 0.5rem 0 0;
+    overflow: hidden;
+    border-bottom: none;
+}
+#itemInfoModal .modal-content .modal-header img {
+    width: 500px;
+    height: 200px;
+    object-fit: cover;
+}
+#itemInfoModal .modal-content .modal-body {
+    padding: 1rem;
+    background-color: var(--white-color);
+    border-radius: 0 0 0.5rem 0.5rem;
+}
 #itemInfoModal table {
     margin-bottom: 0;
+    display: flex;
+    flex-direction: column;
 }
 #itemInfoModal table thead {
+    margin-bottom: 1rem;
+    border-radius: 0.5rem;
     background-color: var(--blue-color);
     color: var(--white-color);
 }
-#itemInfoModal table thead tr th {
-    font-weight: 300;
-    font-size: 14px;
+#itemInfoModal table tbody {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
 }
-#itemInfoModal table thead tr th:first-child {
-    border-top-left-radius: 6px;
+#itemInfoModal table thead tr,
+#itemInfoModal table tbody tr
+{
+    display: flex;
 }
-#itemInfoModal table thead tr th:last-child {
-    border-top-right-radius: 6px;
-
+#itemInfoModal table thead tr th,
+#itemInfoModal table tbody tr td
+{
+    flex: 1 1 50%;
+    border-bottom-width: 0;
+}
+#itemInfoModal table tbody tr {
+    background-color: var(--grey-light-color);
+    border-bottom: 1px solid var(--grey-hover-color);
+    color: var(--grey-color);
+    border-radius: .5rem;
+}
+#itemInfoModal table tbody tr:hover {
+    background-color: var(--grey-hover-color);
 }
 
 /* leaderboard table */
