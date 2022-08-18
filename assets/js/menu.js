@@ -21,18 +21,20 @@
 const nav = document.querySelector('.navbar');
 const content = document.querySelector('.container-content');
 const li = document.querySelector('.navbar-toggle');
-const span = li.querySelector('span');
-li.addEventListener('click', function (e) {
-    e.preventDefault();
-    nav.classList.toggle('active');
+if (nav) {
+    const span = li.querySelector('span');
+    li.addEventListener('click', function (e) {
+        e.preventDefault();
+        nav.classList.toggle('active');
 
-    if (content.classList.contains('open')) {
-        content.classList.remove('open')
-        content.classList.add('close');
-        span.innerHTML = '<i class="fa-solid fa-bars"></i>';
-    } else {
-        span.innerHTML = '<i class="fa-solid fa-xmark"></i>';
-        content.classList.add('open')
-        content.classList.remove('close')
-    }
-})
+        if (content.classList.contains('open')) {
+            content.classList.remove('open')
+            content.classList.add('close');
+            span.innerHTML = '<i class="fa-solid fa-bars"></i>';
+        } else {
+            span.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+            content.classList.add('open')
+            content.classList.remove('close')
+        }
+    })
+}
