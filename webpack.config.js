@@ -1,6 +1,19 @@
 const path = require('path');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
+const styleLoader = {
+    loader: "style-loader",
+    options: {}
+}
+const cssLoader = {
+    loader: "css-loader",
+    options: {}
+}
+const sassLoader = {
+    loader: "sass-loader",
+    options: {}
+}
+
 module.exports = {
     mode: "development",
     entry: {
@@ -32,16 +45,16 @@ module.exports = {
             {
                 test: /\.css$/,
                 use: [
-                    'style-loader',
-                    'css-loader'
+                    styleLoader,
+                    cssLoader
                 ]
             },
             {
                 test: /\.scss$/,
                 use: [
-                    'style-loader',
-                    'css-loader',
-                    'sass-loader'
+                    styleLoader,
+                    cssLoader,
+                    sassLoader
                 ]
             },
             {
