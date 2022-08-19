@@ -37,6 +37,14 @@ module.exports = {
                 ]
             },
             {
+                test: /\.scss$/,
+                use: [
+                    'style-loader',
+                    'css-loader',
+                    'sass-loader'
+                ]
+            },
+            {
                 test: /\.(png|jpg|jpeg|gif|ico|svg)$/,
                 type: 'asset/resource',
                 generator: {

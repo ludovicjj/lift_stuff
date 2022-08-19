@@ -18,8 +18,8 @@
     --grey-light-color: #f7f7f7;
     --grey-hover-color: #e5e5e5;
     --nav-buttom-color: #dee2e6;
-    --nav-link-weight: 58px;
-    --nav-link-height: 58px;
+    --nav-icon-weight: 58px;
+    --nav-icon-height: 58px;
 
     --bs-gray-100: #f8f9fa;
     --bs-gray-200: #e9ecef;
@@ -49,11 +49,15 @@ body > .wrapper-flex > .container {
     margin-right: 5px;
     max-width: 100%;
 }
-/* NAVBAR */
+main {
+    flex: 1 0 auto;
+    min-height: 100vh;
+}
 
+// NAVBAR
 .navbar {
     height: 100%;
-    width: 78px; /*10 + 58 + 10 = 78*/
+    width: 78px; //10(padding li) + 58 + 10(padding li) = 78
     position: fixed;
     top: 0;
     left: 0;
@@ -65,9 +69,9 @@ body > .wrapper-flex > .container {
     padding: 0;
     transition: width .5s;
     box-shadow: 0.125em 0 0.5em rgba(0, 0, 0, 0.14);
-}
-.navbar.active {
-    width: 170px;
+    &.active {
+        width: 170px;
+    }
 }
 .navbar ul {
     margin: 0;
@@ -76,15 +80,16 @@ body > .wrapper-flex > .container {
     color: var(--main-color);
     width: 100%;
 }
-.navbar ul li:not(:last-child) {
-    margin-bottom: 1rem;
-}
-.navbar ul li:first-child{
-    margin-top: 1rem;
-}
 .navbar ul li {
     padding: 0 10px;
+    &:first-child {
+        margin-top: 1rem;
+    }
+    &:not(:last-child) {
+        margin-bottom: 1rem;
+    }
 }
+
 .navbar ul li a {
     text-decoration: none;
     color: inherit;
@@ -95,16 +100,16 @@ body > .wrapper-flex > .container {
     overflow-x: hidden;
     border-radius: .5rem;
     transition: background-color .5s;
-}
-.navbar ul li a.navbar-toggle-link {
-    max-width: var(--nav-link-weight);
-}
-.navbar ul li a:hover,
-.navbar ul li a.current {
-    background-color: var(--main-color);
-    color: var(--white-color);
-}
 
+    &.navbar-toggle-link {
+        max-width: var(--nav-link-weight);
+    }
+
+    &.current, &:hover {
+        background-color: var(--main-color);
+        color: var(--white-color);
+    }
+}
 .navbar ul li .navbar-helper {
     padding-left: 15px;
     opacity: 0;
@@ -114,14 +119,13 @@ body > .wrapper-flex > .container {
     opacity: 1;
 }
 .navbar ul li .navbar-icon {
-    min-width: var(--nav-link-weight);
-    max-width: var(--nav-link-weight);
-    height: var(--nav-link-height);
+    min-width: var(--nav-icon-weight);
+    max-width: var(--nav-icon-weight);
+    height: var(--nav-icon-height);
     display: flex;
     justify-content: center;
     align-items: center;
 }
-
 
 .container-content.open,
 .container-content.close
@@ -134,37 +138,32 @@ body > .wrapper-flex > .container {
 .container-content.close {
     margin-left: 83px;
 }
-/* NAVBAR END */
-main {
-    flex: 1 0 auto;
-    min-height: 100vh;
-}
+// NAVBAR END
 
 .btn-yellow {
     background-color: var(--main-color);
     color: var(--white-color);
+    &:hover, &:active, &:focus {
+        background-color: var(--main-hover-color);
+        border: 1px solid var(--main-hover-color);
+        color: var(--white-color);
+    }
 }
 .btn-outline-yellow {
     color: var(--main-color);
     border: 1px var(--main-color) solid;
+    &:hover, &:active, &:focus {
+        background-color: var(--main-hover-color);
+        color: var(--white-color);
+        border: 1px var(--main-hover-color) solid;
+    }
 }
-
-/* hover, active , focus */
-.btn-outline-yellow:hover, .btn-outline-yellow:active, .btn-outline-yellow:focus{
-    background-color: var(--main-hover-color);
-    color: var(--white-color);
-    border: 1px var(--main-hover-color) solid;
-}
-
-.btn-yellow:hover, .btn-yellow:active, .btn-yellow:focus {
-    background-color: var(--main-hover-color);
-    border: 1px solid var(--main-hover-color);
-    color: var(--white-color);
-}
-.btn-yellow[type="submit"]:active, .btn-yellow[type="submit"]:focus {
-    background-color: var(--main-color);
-    border: 1px solid var(--main-color);
-    color: var(--white-color);
+.btn-yellow[type="submit"] {
+    &:active, &:focus {
+        background-color: var(--main-color);
+        border: 1px solid var(--main-color);
+        color: var(--white-color);
+    }
 }
 
 .btn-blue:focus {
@@ -193,9 +192,10 @@ main {
 }
 .table-responsive {
     padding-right: 5px;
-    /*overflow-y: scroll;*/
+    //overflow-y: scroll;
     scrollbar-color: var(--main-color) #c9c8c8;
     scrollbar-width: thin;
 }
+
 
 
