@@ -1,3 +1,6 @@
+@import "./_variables";
+@import "./_bootstrap";
+@import "~@fortawesome/fontawesome-free/css/all.css";
 @font-face {
     src: url("../font/Mulish-VariableFont_wght.ttf");
     font-family: 'Mulish';
@@ -7,8 +10,6 @@
     --sand-dark-color: #ce9975;
     --white-color: #fff;
     --black-color: #000000;
-    /*--blue-color: #2A265F;*/
-    /*--blue-hover-color: #7271bb;*/
     --main-color: #e9b957;
     --main-hover-color: #c79231;
 
@@ -18,18 +19,8 @@
     --grey-light-color: #f7f7f7;
     --grey-hover-color: #e5e5e5;
     --nav-buttom-color: #dee2e6;
-    --nav-icon-weight: 58px;
+    --nav-icon-width: 58px;
     --nav-icon-height: 58px;
-
-    --bs-gray-100: #f8f9fa;
-    --bs-gray-200: #e9ecef;
-    --bs-gray-300: #dee2e6;
-    --bs-gray-400: #ced4da;
-    --bs-gray-500: #adb5bd;
-    --bs-gray-600: #6c757d;
-    --bs-gray-700: #495057;
-    --bs-gray-800: #343a40;
-    --bs-gray-900: #212529;
 }
 body {
     background-color: var(--bs-gray-200);
@@ -62,7 +53,6 @@ main {
     top: 0;
     left: 0;
     background-color: var(--white-color);
-    overflow-x: hidden;
     display: flex;
     flex-direction: column;
     margin: 0;
@@ -102,7 +92,7 @@ main {
     transition: background-color .5s;
 
     &.navbar-toggle-link {
-        max-width: var(--nav-link-weight);
+        max-width: var(--nav-icon-width);
     }
 
     &.current, &:hover {
@@ -119,8 +109,8 @@ main {
     opacity: 1;
 }
 .navbar ul li .navbar-icon {
-    min-width: var(--nav-icon-weight);
-    max-width: var(--nav-icon-weight);
+    min-width: var(--nav-icon-width);
+    max-width: var(--nav-icon-width);
     height: var(--nav-icon-height);
     display: flex;
     justify-content: center;

@@ -10,7 +10,12 @@
             </a>
         </li>
         <li>
-            <a href="{{ path('login') }}" class="nav-link{% if (current_path == 'login') %} current{% endif %}">
+            <a href="{{ path('login') }}"
+               class="nav-link{% if (current_path == 'login') %} current{% endif %}"
+               data-bs-toggle="tooltip"
+               data-bs-placement="right"
+               title="Login"
+            >
                 <span class="navbar-icon">
                     <i class="fa-solid fa-user"></i>
                 </span>
@@ -18,7 +23,12 @@
             </a>
         </li>
         <li>
-            <a href="{{ path('home') }}" class="nav-link{% if (current_path == 'home') %} current{% endif %}">
+            <a href="{{ path('home') }}"
+               class="nav-link{% if (current_path == 'home') %} current{% endif %}"
+               data-bs-toggle="tooltip"
+               data-bs-placement="right"
+               title="Home"
+            >
                 <span class="navbar-icon">
                     <i class="fa-solid fa-house"></i>
                 </span>
@@ -26,7 +36,11 @@
             </a>
         </li>
         <li>
-            <a href="{{ path('logout') }}">
+            <a href="{{ path('logout') }}"
+               data-bs-toggle="tooltip"
+               data-bs-placement="right"
+               title="Logout"
+            >
                 <span class="navbar-icon">
                     <i class="fa-solid fa-power-off"></i>
                 </span>
