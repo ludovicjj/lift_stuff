@@ -20,7 +20,8 @@ module.exports = {
         rep_log: "./assets/js/rep_log.js",
         menu: "./assets/js/menu.js",
         main: "./assets/js/main.js",
-        login: "./assets/js/login.js"
+        login: "./assets/js/login.js",
+        loader: "./assets/js/loader.js"
     },
     output: {
         path: path.resolve(__dirname, "public", "build"),
