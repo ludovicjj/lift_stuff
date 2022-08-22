@@ -25,13 +25,11 @@
 body {
     background-color: var(--bs-gray-200);
     font-family: 'Mulish', sans-serif;
-}
-.wrapper-flex {
     display: flex;
     flex-direction: row;
     flex-wrap: nowrap;
 }
-body > .wrapper-flex > .container {
+body > .container {
     display: flex;
     flex-direction: column;
 }
