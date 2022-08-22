@@ -17,7 +17,8 @@ class AddRepLogTest extends PantherTestCase
         $this->loadFixtures();
 
         $this->loginPantherClient($client);
-        $crawler = $client->request('GET', '/');
+        $crawler = $client->getCrawler();
+
         $values = [
             'item' => 'cat',
             'reps' => '5',
@@ -42,7 +43,7 @@ class AddRepLogTest extends PantherTestCase
         $this->loadFixtures();
 
         $this->loginPantherClient($client);
-        $crawler = $client->request('GET', '/');
+        $crawler = $client->getCrawler();
 
         $crawler->filter('.js-new-rep-log-form button')->click();
 
@@ -66,7 +67,7 @@ class AddRepLogTest extends PantherTestCase
         $this->loadFixtures();
 
         $this->loginPantherClient($client);
-        $crawler = $client->request('GET', '/');
+        $crawler = $client->getCrawler();
         $values = [
             'item' => '',
             'reps' => '5'
@@ -87,7 +88,7 @@ class AddRepLogTest extends PantherTestCase
         $this->loadFixtures();
 
         $this->loginPantherClient($client);
-        $crawler = $client->request('GET', '/');
+        $crawler = $client->getCrawler();
         $values = [
             'item' => 'cat',
             'reps' => ''
@@ -108,7 +109,7 @@ class AddRepLogTest extends PantherTestCase
         $this->loadFixtures();
 
         $this->loginPantherClient($client);
-        $crawler = $client->request('GET', '/');
+        $crawler = $client->getCrawler();
         $values = [
             'item' => 'cat',
             'reps' => '5'

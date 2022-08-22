@@ -27,10 +27,12 @@ trait FunctionalTestTrait
     private function loginPantherClient(Client $client): void
     {
         $crawler = $client->request('GET', '/login');
+        $client->waitForInvisibility('.loader');
         $form = $crawler->filter('form[name=login]')->form([
             '_email' => 'test@example.com',
             '_password' => "password"
         ]);
         $client->submit($form);
+        $client->waitForInvisibility('.loader');
     }
 }
