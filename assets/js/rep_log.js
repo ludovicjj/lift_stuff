@@ -4,8 +4,7 @@ const Accordion = require('./Components/Accordion');
 require('../css/home.css');
 
 let wrapper = document.querySelector('.js-rep-log-table');
-new RepLogApp(wrapper);
-
+new RepLogApp(wrapper, wrapper.getAttribute('data-rep-logs'));
 
 const infoLink = document.getElementById('item-info');
 const modalInfo = document.getElementById('itemInfoModal');

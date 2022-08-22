@@ -21,22 +21,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 #[Route("/api", name: "rep_log_")]
 class RepLogController extends BaseController
 {
-    public function __construct(
-        private EntityManagerInterface $entityManager,
-        SerializerInterface $serializer
-    )
-    {
-        parent::__construct($serializer);
-    }
-
     #[Route("/reps", name: "list", methods: ['GET'])]
-    public function listRepLog(RepLogRepository $repLogRepository): Response
+    public function listRepLog(): Response
     {
-        $repLogs = $repLogRepository->findBy(['user' => $this->getUser()]);
-        $models = [];
-        foreach ($repLogs as $repLog) {
-            $models[] = $this->createRepLogModel($repLog);
-        }
+        $models = $this->findAllRepLogsModelByUser();
+
         return $this->createApiResponse([
             'items' => $models
         ]);
@@ -57,7 +46,11 @@ class RepLogController extends BaseController
     }
 
     #[Route("/reps/{id}", name: "delete", methods: ['DELETE'])]
-    public function deleteRepLog(RepLogRepository $repLogRepository, Request $request): JsonResponse
+    public function deleteRepLog(
+        RepLogRepository $repLogRepository,
+        Request $request,
+        EntityManagerInterface $entityManager
+    ): JsonResponse
     {
         if ($request->isXmlHttpRequest()) {
             $this->denyAccessUnlessGranted('ROLE_USER');
@@ -69,8 +62,8 @@ class RepLogController extends BaseController
 
             $this->denyAccessUnlessGranted(RepLogVoter::DELETE, $repLog, "You are not allow to do this action");
 
-            $this->entityManager->remove($repLog);
-            $this->entityManager->flush();
+            $entityManager->remove($repLog);
+            $entityManager->flush();
             return new JsonResponse(null, 204);
         }
 
@@ -87,6 +80,7 @@ class RepLogController extends BaseController
         Request $request,
         SerializerInterface $serializer,
         ValidatorInterface $validator,
+        EntityManagerInterface $entityManager
     ): Response
     {
         if ($request->isXmlHttpRequest()) {
@@ -105,8 +99,8 @@ class RepLogController extends BaseController
             $contraintList = $validator->validate($repLog);
             ErrorValidationFactory::buildError($contraintList);
 
-            $this->entityManager->persist($repLog);
-            $this->entityManager->flush();
+            $entityManager->persist($repLog);
+            $entityManager->flush();
 
             $response = new Response(null, 204);
             $response->headers->set(

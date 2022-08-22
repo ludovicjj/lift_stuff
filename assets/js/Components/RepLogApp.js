@@ -5,14 +5,17 @@ let HelperInstance = new WeakMap();
 class RepLogApp {
     /**
      * @param {HTMLElement} wrapper
+     * @param {string} initialRepLogs
      */
-    constructor(wrapper) {
+    constructor(wrapper, initialRepLogs) {
         this.wrapper = wrapper;
         this.repLogs = [];
         HelperInstance.set(this, new Helper(this.repLogs));
         this.form = this.wrapper.querySelector(RepLogApp.selector.repLogForm);
 
-        this.loadRepLogs();
+        for (let repLog of JSON.parse(initialRepLogs)) {
+            this._addRow(repLog);
+        }
 
         this.wrapper
             .querySelector('tbody')
@@ -26,16 +29,6 @@ class RepLogApp {
             repLogForm: '.js-new-rep-log-form',
             repLogDeleteLink: '.js-delete-rep-log'
         }
-    }
-
-    loadRepLogs() {
-        this.fetch('/api/reps', 'GET', {"Accept": "application/json"}).then(response => {
-            return response.json();
-        }).then(data => {
-            for (let repLog of data.items) {
-                this._addRow(repLog);
-            }
-        })
     }
 
     handleRepLogDelete(e) {
