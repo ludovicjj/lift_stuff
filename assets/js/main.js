@@ -1,6 +1,4 @@
-//const bootstrap = require('bootstrap');
 import * as bootstrap from 'bootstrap'
-// require('bootstrap/dist/css/bootstrap.css'); // Now load scss into main.scss
 import '@fortawesome/fontawesome-free/js/all.js';
 import '../css/main.scss';
 import './menu';
