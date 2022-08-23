@@ -1,4 +1,4 @@
-const bootstrap = require('bootstrap')
+import * as bootstrap from 'bootstrap'
 class Modal {
     /**
      * @param {HTMLElement} link
@@ -19,4 +19,4 @@ class Modal {
     }
 }
 
-module.exports = Modal
+export default Modal

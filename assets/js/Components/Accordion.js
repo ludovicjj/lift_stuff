@@ -61,4 +61,4 @@ class Accordion {
     }
 }
 
-module.exports = Accordion
+export default Accordion

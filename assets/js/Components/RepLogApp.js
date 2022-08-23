@@ -1,5 +1,5 @@
-const Helper = require('./RepLogHelper');
-const Swal = require('sweetalert2');
+import Helper from './RepLogHelper'
+import Swal from 'sweetalert2'
 let HelperInstance = new WeakMap();
 
 class RepLogApp {
@@ -222,4 +222,4 @@ const rowFragment = (repLog) => {
     return template;
 }
 
-module.exports = RepLogApp;
+export default RepLogApp;
