@@ -2,9 +2,17 @@ const path = require('path');
 const fs = require('fs');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const isDevelopment = process.env.NODE_ENV !== 'production';
+const TerserPlugin = require('terser-webpack-plugin');
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
-module.exports = {
+const isDevelopment = process.env.NODE_ENV !== 'production';
+const cssLoader = {
+    loader: 'css-loader',
+    options: {
+        sourceMap: !isDevelopment
+    }
+};
+const webpackConfig = {
     mode: isDevelopment ? 'development' : 'production',
     entry: {
         rep_log: "./assets/js/rep_log.js",
@@ -34,14 +42,14 @@ module.exports = {
                 test: /\.css$/,
                 use: [
                     MiniCssExtractPlugin.loader,
-                    "css-loader"
+                    cssLoader
                 ],
             },
             {
                 test: /\.scss$/,
                 use: [
                     MiniCssExtractPlugin.loader,
-                    "css-loader",
+                    cssLoader,
                     "sass-loader"
                 ]
             },
@@ -71,7 +79,7 @@ module.exports = {
             ]
         })
     ],
-    devtool: 'inline-source-map',
+    devtool: isDevelopment ? 'inline-source-map' : false,
     optimization: {
         splitChunks: {
             cacheGroups: {
@@ -94,3 +102,13 @@ module.exports = {
         hot: true
     }
 }
+
+if (!isDevelopment) {
+    webpackConfig.optimization.minimize = true;
+    webpackConfig.optimization.minimizer = [
+        new TerserPlugin(),
+        new CssMinimizerPlugin()
+    ];
+}
+
+module.exports = webpackConfig;
