@@ -7,18 +7,18 @@
         <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text></svg>">
         {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
         {% block stylesheets %}
+            <link rel="stylesheet" href="{{ asset('build/main.css') }}">
             {#{{ encore_entry_link_tags('app') }}#}
         {% endblock %}
 
         {% block javascripts %}
-            <script src="{{ asset('build/loader.js') }}"></script>
             <script src="{{ asset('build/main.js') }}" defer></script>
             <script src="{{ asset('build/vendors.js') }}" defer></script>
             {#{{ encore_entry_script_tags('app') }}#}
         {% endblock %}
     </head>
     <body>
-    <div class="loader" style="background-color: #e9b957;position: absolute;top:0;left:0;z-index: 99;width: 100%;height: 100vh;">
+    <div class="loader">
         <i class="fa-solid fa-spinner fa-spin"></i>
     </div>
         {% if app.user %}

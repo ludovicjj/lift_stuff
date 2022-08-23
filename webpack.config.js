@@ -1,31 +1,21 @@
 const path = require('path');
+const fs = require('fs');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-
-const styleLoader = {
-    loader: "style-loader",
-    options: {}
-}
-const cssLoader = {
-    loader: "css-loader",
-    options: {}
-}
-const sassLoader = {
-    loader: "sass-loader",
-    options: {}
-}
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const isDevelopment = process.env.NODE_ENV !== 'production';
 
 module.exports = {
-    mode: "development",
+    mode: isDevelopment ? 'development' : 'production',
     entry: {
         rep_log: "./assets/js/rep_log.js",
         main: "./assets/js/main.js",
-        login: "./assets/js/login.js",
-        loader: "./assets/js/loader.js"
+        login: "./assets/js/login.js"
     },
     output: {
         path: path.resolve(__dirname, "public", "build"),
         filename: "[name].js",
-        assetModuleFilename: 'asset/[hash][ext][query]'
+        assetModuleFilename: 'asset/[hash][ext][query]',
+        publicPath: '/build/'
     },
     module: {
         rules: [
@@ -43,16 +33,16 @@ module.exports = {
             {
                 test: /\.css$/,
                 use: [
-                    styleLoader,
-                    cssLoader
-                ]
+                    MiniCssExtractPlugin.loader,
+                    "css-loader"
+                ],
             },
             {
                 test: /\.scss$/,
                 use: [
-                    styleLoader,
-                    cssLoader,
-                    sassLoader
+                    MiniCssExtractPlugin.loader,
+                    "css-loader",
+                    "sass-loader"
                 ]
             },
             {
@@ -72,6 +62,9 @@ module.exports = {
         ]
     },
     plugins: [
+        new MiniCssExtractPlugin({
+            filename: "[name].css",
+        }),
         new CopyWebpackPlugin({
             patterns: [
                 {from: "assets/static", to: "static"}
@@ -89,5 +82,15 @@ module.exports = {
                 }
             }
         }
+    },
+    devServer: {
+        https: {
+            key: fs.readFileSync("./ssl/cert.key"),
+            cert: fs.readFileSync("./ssl/cert.crt"),
+            ca: fs.readFileSync("./ssl/ca.crt"),
+        },
+        headers: { 'Access-Control-Allow-Origin': '*' },
+        port: 8080,
+        hot: true
     }
 }

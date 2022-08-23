@@ -185,5 +185,30 @@ main {
     scrollbar-width: thin;
 }
 
+// LOADER
+.loader {
+    background-color: #e9b957;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 99;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    &.hidden {
+        animation: fadeOut 1s;
+        animation-fill-mode: forwards;
+    }
+}
+@keyframes fadeOut {
+    100% {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
 
 
