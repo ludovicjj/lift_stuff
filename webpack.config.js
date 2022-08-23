@@ -18,7 +18,6 @@ module.exports = {
     mode: "development",
     entry: {
         rep_log: "./assets/js/rep_log.js",
-        menu: "./assets/js/menu.js",
         main: "./assets/js/main.js",
         login: "./assets/js/login.js",
         loader: "./assets/js/loader.js"
@@ -36,9 +35,7 @@ module.exports = {
                 use: {
                     loader: "babel-loader",
                     options: {
-                        presets: [
-                            ['@babel/preset-env', { targets: "defaults" }]
-                        ],
+                        presets: ['@babel/preset-env'],
                         cacheDirectory: true
                     }
                 }
@@ -81,5 +78,16 @@ module.exports = {
             ]
         })
     ],
-    devtool: 'inline-source-map'
+    devtool: 'inline-source-map',
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                commons: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: 'vendor',
+                    chunks: 'all'
+                }
+            }
+        }
+    }
 }
