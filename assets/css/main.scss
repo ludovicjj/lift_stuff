@@ -1,0 +1,214 @@
+@import "./_variables";
+@import "./_bootstrap";
+@import "~@fortawesome/fontawesome-free/css/all.css";
+@font-face {
+    src: url("../font/Mulish-VariableFont_wght.ttf");
+    font-family: 'Mulish';
+}
+:root {
+    --sand-color: #dd9a6f;
+    --sand-dark-color: #ce9975;
+    --white-color: #fff;
+    --black-color: #000000;
+    --main-color: #e9b957;
+    --main-hover-color: #c79231;
+
+    --blue-hover-rbga-color: rgba(114, 113, 187, .25);
+    --scroll-bar-color: #f1f1f1;
+    --grey-color: #808080FF;
+    --grey-light-color: #f7f7f7;
+    --grey-hover-color: #e5e5e5;
+    --nav-buttom-color: #dee2e6;
+    --nav-icon-width: 58px;
+    --nav-icon-height: 58px;
+}
+body {
+    background-color: var(--bs-gray-200);
+    font-family: 'Mulish', sans-serif;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+body > .container {
+    display: flex;
+    flex-direction: column;
+}
+.container-content {
+    margin-left: 83px;
+    margin-right: 5px;
+    max-width: 100%;
+}
+main {
+    flex: 1 0 auto;
+    min-height: 100vh;
+}
+
+// NAVBAR
+.navbar {
+    height: 100%;
+    width: 78px; //10(padding li) + 58 + 10(padding li) = 78
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: var(--white-color);
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    transition: width .5s;
+    box-shadow: 0.125em 0 0.5em rgba(0, 0, 0, 0.14);
+    &.active {
+        width: 170px;
+    }
+}
+.navbar ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    color: var(--main-color);
+    width: 100%;
+}
+.navbar ul li {
+    padding: 0 10px;
+    &:first-child {
+        margin-top: 1rem;
+    }
+    &:not(:last-child) {
+        margin-bottom: 1rem;
+    }
+}
+
+.navbar ul li a {
+    text-decoration: none;
+    color: inherit;
+    width: 100%;
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    overflow-x: hidden;
+    border-radius: .5rem;
+    transition: background-color .5s;
+
+    &.navbar-toggle-link {
+        max-width: var(--nav-icon-width);
+    }
+
+    &.current, &:hover {
+        background-color: var(--main-color);
+        color: var(--white-color);
+    }
+}
+.navbar ul li .navbar-helper {
+    padding-left: 15px;
+    opacity: 0;
+    transition: 0.5s;
+}
+.navbar.active ul li .navbar-helper {
+    opacity: 1;
+}
+.navbar ul li .navbar-icon {
+    min-width: var(--nav-icon-width);
+    max-width: var(--nav-icon-width);
+    height: var(--nav-icon-height);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container-content.open,
+.container-content.close
+{
+    transition: margin-left .5s;
+}
+.container-content.open {
+    margin-left: 175px;
+}
+.container-content.close {
+    margin-left: 83px;
+}
+// NAVBAR END
+
+.btn-yellow {
+    background-color: var(--main-color);
+    color: var(--white-color);
+    &:hover, &:active, &:focus {
+        background-color: var(--main-hover-color);
+        border: 1px solid var(--main-hover-color);
+        color: var(--white-color);
+    }
+}
+.btn-outline-yellow {
+    color: var(--main-color);
+    border: 1px var(--main-color) solid;
+    &:hover, &:active, &:focus {
+        background-color: var(--main-hover-color);
+        color: var(--white-color);
+        border: 1px var(--main-hover-color) solid;
+    }
+}
+.btn-yellow[type="submit"] {
+    &:active, &:focus {
+        background-color: var(--main-color);
+        border: 1px solid var(--main-color);
+        color: var(--white-color);
+    }
+}
+
+.btn-blue:focus {
+    box-shadow: 0 0 0 .25rem var(--blue-hover-rbga-color);
+}
+
+/* SCROLL BAR */
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: var(--scroll-bar-color);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background:var(--main-color);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--main-hover-color);
+}
+.table-responsive {
+    padding-right: 5px;
+    //overflow-y: scroll;
+    scrollbar-color: var(--main-color) #c9c8c8;
+    scrollbar-width: thin;
+}
+
+// LOADER
+.loader {
+    background-color: #e9b957;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 99;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    &.hidden {
+        animation: fadeOut 1s;
+        animation-fill-mode: forwards;
+    }
+}
+@keyframes fadeOut {
+    100% {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+
+

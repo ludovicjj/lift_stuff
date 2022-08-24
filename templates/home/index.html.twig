@@ -1,20 +1,11 @@
 {% extends 'base.html.twig' %}
-
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('css/home.css') }}">
+    <link rel="stylesheet" href="{{ asset('build/rep_log.css') }}">
 {% endblock %}
-
 {% block javascripts %}
     {{ parent() }}
-    <script src="{{ asset('js/home.js') }}" defer></script>
-    <script src="{{ asset('dist/RepLogApp.js') }}" defer></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            let wrapper = document.querySelector('.js-rep-log-table');
-            new RepLogApp(wrapper)
-        });
-    </script>
+    <script src="{{ asset('build/rep_log.js') }}" defer></script>
 {% endblock %}
 
 {% block body %}
@@ -30,7 +21,7 @@
                             </div>
                             <a href="#" id="item-info">View items info <i class="fa-solid fa-chevron-right"></i></a>
                         </div>
-                        <div class="col-md-9 card-content js-rep-log-table">
+                        <div class="col-md-9 card-content js-rep-log-table" data-rep-logs="{{ repLogsJson|e('html_attr') }}">
                             <div class="table-responsive mb-3">
                                 <table class="table table-hover">
                                     <thead>
@@ -66,7 +57,7 @@
 
     <div class="row my-5">
         <div class="col-12">
-            <div class="accordion-custom show">
+            <div class="accordion-container show">
                 <button class="accordion-btn">
                     <span>Lift Leader Board</span>
                     <i class="fa-solid fa-chevron-down"></i>

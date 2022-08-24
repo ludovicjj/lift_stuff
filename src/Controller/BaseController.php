@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Api\RepLogModelApi;
 use App\Entity\RepLog;
+use App\Repository\RepLogRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -11,11 +12,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 
 class BaseController extends AbstractController
 {
-    private SerializerInterface $serializer;
-
-    public function __construct(SerializerInterface $serializer)
+    public function __construct(private SerializerInterface $serializer, private RepLogRepository $repLogRepository)
     {
-        $this->serializer = $serializer;
     }
 
     protected function createRepLogModel(RepLog $repLog): RepLogModelApi
@@ -34,5 +32,19 @@ class BaseController extends AbstractController
     {
         $json = $this->serializer->serialize($data, 'json');
         return new JsonResponse($json, $statusCode, [], true);
+    }
+
+    /**
+     * @return RepLogModelApi[]
+     */
+    protected function findAllRepLogsModelByUser(): array
+    {
+        $repLogs = $this->repLogRepository->findBy(['user' => $this->getUser()]);
+        $models = [];
+
+        foreach ($repLogs as $repLog) {
+            $models[] = $this->createRepLogModel($repLog);
+        }
+        return $models;
     }
 }

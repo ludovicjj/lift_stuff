@@ -1,18 +1,21 @@
-import Helper from './RepLogHelper.js'
-
+import Helper from './RepLogHelper'
+import Swal from 'sweetalert2'
 let HelperInstance = new WeakMap();
 
 class RepLogApp {
     /**
      * @param {HTMLElement} wrapper
+     * @param {string} initialRepLogs
      */
-    constructor(wrapper) {
+    constructor(wrapper, initialRepLogs) {
         this.wrapper = wrapper;
         this.repLogs = [];
         HelperInstance.set(this, new Helper(this.repLogs));
         this.form = this.wrapper.querySelector(RepLogApp.selector.repLogForm);
 
-        this.loadRepLogs();
+        for (let repLog of JSON.parse(initialRepLogs)) {
+            this._addRow(repLog);
+        }
 
         this.wrapper
             .querySelector('tbody')
@@ -26,16 +29,6 @@ class RepLogApp {
             repLogForm: '.js-new-rep-log-form',
             repLogDeleteLink: '.js-delete-rep-log'
         }
-    }
-
-    loadRepLogs() {
-        this.fetch('/api/reps', 'GET', {"Accept": "application/json"}).then(response => {
-            return response.json();
-        }).then(data => {
-            for (let repLog of data.items) {
-                this._addRow(repLog);
-            }
-        })
     }
 
     handleRepLogDelete(e) {
@@ -99,14 +92,14 @@ class RepLogApp {
                 this.form.reset();
                 Swal.fire({icon: 'success', title: 'Success', text: 'Your lift have been added with success'})
             }).catch(error => {
-                if (error.code === 422) {
-                    this._mapErrorsToForm(error.errorsData)
-                } else {
-                    Swal.fire({icon: 'error', title: 'Oops...', text: `Something went wrong! (${error.message})`})
-                }
-            }).finally(() => {
-                this._toggleDisabledButton(formSubmitButton)
-            })
+            if (error.code === 422) {
+                this._mapErrorsToForm(error.errorsData)
+            } else {
+                Swal.fire({icon: 'error', title: 'Oops...', text: `Something went wrong! (${error.message})`})
+            }
+        }).finally(() => {
+            this._toggleDisabledButton(formSubmitButton)
+        })
     }
 
     _submitRepLog(data) {
@@ -217,15 +210,15 @@ class RepLogApp {
 const rowFragment = (repLog) => {
     const template = document.createElement('template');
     template.innerHTML = `<tr data-weight="${repLog.totalWeightLifted}" data-reps="${repLog.reps}">
-    <td>${repLog.item}</td>
-    <td>${repLog.reps}</td>
-    <td>${repLog.totalWeightLifted}</td>
-    <td>
-        <a class="btn btn-blue btn-sm js-delete-rep-log" role="button" data-url="${repLog.links.self}">
-            <i class="fa-solid fa-ban"></i>
-        </a>
-    </td>
-    </tr>`;
+<td>${repLog.item}</td>
+<td>${repLog.reps}</td>
+<td>${repLog.totalWeightLifted}</td>
+<td>
+    <a class="btn btn-yellow btn-sm js-delete-rep-log" role="button" data-url="${repLog.links.self}">
+        <i class="fa-solid fa-ban"></i>
+    </a>
+</td>
+</tr>`;
     return template;
 }
 

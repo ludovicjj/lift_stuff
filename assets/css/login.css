@@ -1,0 +1,93 @@
+main {
+    flex: 1 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+/* card */
+.card-login {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    height: fit-content;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    border: none;
+}
+/* card side image */
+.card-img {
+    flex: 1 1 auto;
+    background-image: url("../img/mais.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    display: flex;
+    padding: 1rem;
+    border-radius: var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius) 0 0;
+    height: 300px;
+}
+.card-img .author{
+    display: flex;
+    flex-direction: row-reverse;
+    align-self: flex-end;
+    color: var(--white-color);
+    align-items: center;
+    gap: 0.5rem
+}
+.card-img .author .author_avatar {
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    background-image: url('../img/behelit.jpg');
+    background-position: center center;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+.card-img .author span {
+    font-size: .8rem;
+}
+/* card side form */
+.card-body{
+    flex: 1;
+    padding: 2rem;
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+.card-body h5 {
+    color: var(--main-color);
+}
+
+.wrapper-login-action {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+}
+.wrapper-login-action > * {
+    flex: 1
+}
+
+/* style for screen >= 992px */
+@media (min-width: 992px) {
+    .card-login {
+        flex-direction: row-reverse;
+        height: 790px;
+    }
+    .card-body{
+        width: 50%;
+        flex: 1 1 auto;
+    }
+    .card-img {
+        width: 50%;
+        flex: 1 1 auto;
+        height: 100%;
+        border-radius: 0 var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius) 0;
+    }
+    .card-img .author .author_avatar {
+        width: 50px;
+        height: 50px;
+    }
+    .card-img .author span {
+        font-size: 1rem;
+    }
+}

@@ -8,11 +8,11 @@ class UnsplashProvider
 {
     public function __construct(
         private HttpClientInterface $client,
-        private string $unsplashClientId)
-    {
-    }
+        private string $unsplashClientId
+    )
+    {}
 
-    public function loadPictureFromUnsplash(): array
+    public function loadPictureFromUnsplash(string $photoId): array
     {
         $options = [
             "headers" => [
@@ -24,7 +24,7 @@ class UnsplashProvider
             ]
         ];
 
-        $response = $this->client->request("GET", "https://api.unsplash.com/photos/l1ICIlRbL9I", $options);
+        $response = $this->client->request("GET", "https://api.unsplash.com/photos/{$photoId}", $options);
         $data = $response->toArray();
 
         ["urls" => $urls, "user" => $user] = $data;

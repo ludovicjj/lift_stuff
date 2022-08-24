@@ -17,9 +17,8 @@ class DeleteRepLogTest extends PantherTestCase
         $this->loadFixtures();
 
         $this->loginPantherClient($client);
-        $crawler = $client->request('GET', '/');
-        // loading lift items
-        $client->waitForVisibility('.js-rep-log-table tbody tr');
+        $crawler = $client->getCrawler();
+
         $this->assertSelectorTextContains('.card-reps h2', 'Your Lift History');
 
         $this->assertEquals(3, $crawler->filter('.js-rep-log-table tbody tr')->count());
@@ -44,9 +43,7 @@ class DeleteRepLogTest extends PantherTestCase
         $this->loadFixtures();
 
         $this->loginPantherClient($client);
-        $crawler = $client->request('GET', '/');
-        // loading lift items
-        $client->waitForVisibility('.js-rep-log-table tbody tr');
+        $crawler = $client->getCrawler();
 
         $deleteLink = $crawler->filter('.js-delete-rep-log')->first();
         $deleteRowWeight = $crawler->filter('.js-rep-log-table tbody tr')->first()->getAttribute('data-weight');
@@ -70,9 +67,7 @@ class DeleteRepLogTest extends PantherTestCase
         $client = static::createPantherClient();
         $this->loadFixtures();
         $this->loginPantherClient($client);
-        $crawler = $client->request('GET', '/');
-        // loading lift items
-        $client->waitForVisibility('.js-rep-log-table tbody tr');
+        $crawler = $client->getCrawler();
 
         $deleteLink = $crawler->filter('.js-delete-rep-log')->first();
         $rowReps = $crawler->filter('.js-rep-log-table tbody tr')->first()->getAttribute('data-reps');
@@ -99,9 +94,7 @@ class DeleteRepLogTest extends PantherTestCase
         $client = static::createPantherClient();
         $this->loadFixtures();
         $this->loginPantherClient($client);
-        $crawler = $client->request('GET', '/');
-        // loading lift items
-        $client->waitForVisibility('.js-rep-log-table tbody tr');
+        $crawler = $client->getCrawler();
 
         $client->executeScript("document.querySelector('.js-delete-rep-log').setAttribute('data-url', '/api/reps/752')");
 
