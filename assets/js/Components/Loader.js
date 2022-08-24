@@ -1,36 +1,36 @@
-const hideOverflowContainer = (container, delay = 0) => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            container.style.maxHeight = '100vh';
-            container.style.overflowY = 'hidden';
-            resolve();
-        },delay)
-    })
-}
-const hideLoader = (loader, delay = 0) => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-            loader.classList.add('hidden');
-            resolve();
-        }, delay)
-    })
-}
-const clearContainerAndLoader = (container, loader, delay = 0) => {
-    setTimeout(() => {
-        loader.remove()
-        container.style = null;
-    },delay)
-}
+class Loader {
+    constructor(container, loader) {
+        this.container = container;
+        this.loader = loader;
+        this.run()
+    }
 
-window.addEventListener('DOMContentLoaded', () => {
-    const container = document.querySelector('body > .container')
-    const loader = document.querySelector('.loader');
-
-    hideOverflowContainer(container).then(() => {
+    run() {
+        this.container.style.maxHeight = '100vh';
+        this.container.style.overflowY = 'hidden';
         window.addEventListener('load', () => {
-            hideLoader(loader, 1000).then(() => {
-                clearContainerAndLoader(container, loader, 500)
+            this.hideLoader( 1000).then(() => {
+                this.clearContainerAndLoader(500)
             })
         })
-    })
-})
+
+    }
+
+    hideLoader = (delay = 0) => {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                this.loader.classList.add('hidden');
+                resolve();
+            }, delay)
+        })
+    }
+
+    clearContainerAndLoader = (delay = 0) => {
+        setTimeout(() => {
+            this.loader.remove()
+            this.container.style = null;
+        },delay)
+    }
+}
+
+export default Loader
