@@ -4,6 +4,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
+const useVersioning = true;
 
 const isDevelopment = process.env.NODE_ENV !== 'production';
 const cssLoader = {
@@ -21,9 +23,10 @@ const webpackConfig = {
     },
     output: {
         path: path.resolve(__dirname, "public", "build"),
-        filename: "[name].js",
+        filename: useVersioning ? "[name].[hash:6].js" : "[name].js",
         assetModuleFilename: 'asset/[hash][ext][query]',
-        publicPath: '/build/'
+        publicPath: '/build/',
+        clean: true
     },
     module: {
         rules: [
@@ -71,12 +74,16 @@ const webpackConfig = {
     },
     plugins: [
         new MiniCssExtractPlugin({
-            filename: "[name].css",
+            filename: useVersioning ? "[name].[contenthash:6].css" : "[name].css",
         }),
         new CopyWebpackPlugin({
             patterns: [
                 {from: "assets/static", to: "static"}
             ]
+        }),
+        new WebpackManifestPlugin({
+            writeToFileEmit: true,
+            basePath: 'build/'
         })
     ],
     devtool: isDevelopment ? 'inline-source-map' : false,
