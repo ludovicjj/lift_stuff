@@ -8,7 +8,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "serve": "cross-env NODE_ENV=development webpack serve",
+    "serve": "cross-env NODE_ENV=development DEV_SERVE=on webpack serve",
     "build": "cross-env NODE_ENV=development webpack",
     "production": "cross-env NODE_ENV=production webpack"
   },
