@@ -43,8 +43,8 @@ jobs:
             - name: Install NPM dependencies
               run: npm install
 
-            - name: Webpack build
-              run: ./node_modules/.bin/webpack
+            - name: Build dependencies
+              run: npm run build
 
             - name: Create Database
               run: |
