@@ -5,17 +5,21 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require('terser-webpack-plugin');
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
-const useVersioning = true;
 
-const isDevelopment = process.env.NODE_ENV !== 'production';
+const isProduction = process.env.NODE_ENV === 'production';
+const useDevServer = process.env.DEV_SERVE === 'on';
+const useVersioning = true;
+const useSourceMaps = !isProduction;
+const publicPath = useDevServer ? 'https://localhost:8080/build/' : '/build/';
+
 const cssLoader = {
     loader: 'css-loader',
     options: {
-        sourceMap: !isDevelopment
+        sourceMap: useSourceMaps
     }
 };
 const webpackConfig = {
-    mode: isDevelopment ? 'development' : 'production',
+    mode: isProduction ? 'production' : 'development',
     entry: {
         rep_log: "./assets/js/rep_log.js",
         main: "./assets/js/main.js",
@@ -23,9 +27,9 @@ const webpackConfig = {
     },
     output: {
         path: path.resolve(__dirname, "public", "build"),
-        filename: useVersioning ? "[name].[hash:6].js" : "[name].js",
+        filename: useVersioning ? "[name].[contenthash:6].js" : "[name].js",
         assetModuleFilename: 'asset/[hash][ext][query]',
-        publicPath: '/build/',
+        publicPath: publicPath,
         clean: true
     },
     module: {
@@ -86,7 +90,7 @@ const webpackConfig = {
             basePath: 'build/'
         })
     ],
-    devtool: isDevelopment ? 'inline-source-map' : false,
+    devtool: useSourceMaps ? 'inline-source-map' : false,
     optimization: {
         splitChunks: {
             cacheGroups: {
@@ -110,7 +114,7 @@ const webpackConfig = {
     }
 }
 
-if (!isDevelopment) {
+if (isProduction) {
     webpackConfig.optimization.minimize = true;
     webpackConfig.optimization.minimizer = [
         new TerserPlugin(),
