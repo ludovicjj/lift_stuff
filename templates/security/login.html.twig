@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block body %}
-    <div class="card card-login">
+    <div class="card card-{% if app.user %}logged{% else %}login{% endif %}">
         <div class="card-img">
             <div class="author">
                 <span>LudovicJJ</span>
@@ -19,28 +19,35 @@
             </div>
         </div>
         <div class="card-body">
-            <h5 class="card-title mb-3">Login your account</h5>
-            {% if error %}
-                {{  include("components/alert.html.twig", {state: "danger", content: error.messageKey|trans(error.messageData, 'security')}) }}
-            {% endif %}
-            <form name="login" action="{{ path('login') }}" method="post">
-                <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
-                <div class="mb-3">
-                    <label for="email" class="form-label">Email:</label>
-                    <input type="text" class="form-control" id="email" name="_email" value="{{ last_email }}"/>
-                </div>
-                <div class="mb-3">
-                    <label for="password" class="form-label">Password:</label>
-                    <input type="password" class="form-control" id="password" name="_password" autocomplete="off"/>
-                </div>
+            {% if app.user %}
+                <h5 class="card-title mb-3">You are already login</h5>
+                <p>
+                    It looks like you are already logged in. You can disconnect by clicking <a href="{{ path('logout') }}">here</a>.
+                </p>
+            {% else %}
+                <h5 class="card-title mb-3">Login your account</h5>
+                {% if error %}
+                    {{  include("components/alert.html.twig", {state: "danger", content: error.messageKey|trans(error.messageData, 'security')}) }}
+                {% endif %}
+                <form name="login" action="{{ path('login') }}" method="post">
+                    <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email:</label>
+                        <input type="text" class="form-control" id="email" name="_email" value="{{ last_email }}"/>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password:</label>
+                        <input type="password" class="form-control" id="password" name="_password" autocomplete="off"/>
+                    </div>
 
-                {# If you want to control the URL the user is redirected to on success
+                    {# If you want to control the URL the user is redirected to on success
                 <input type="hidden" name="_target_path" value="/account"/> #}
-                <div class="wrapper-login-action">
-                    <button class="btn btn-yellow" type="submit">Login</button>
-                    <a class="btn btn-outline-yellow" href="#" role="button">Register</a>
-                </div>
-            </form>
+                    <div class="wrapper-login-action">
+                        <button class="btn btn-yellow" type="submit">Login</button>
+                        <a class="btn btn-outline-yellow" href="#" role="button">Register</a>
+                    </div>
+                </form>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

@@ -1,1 +1,1 @@
-require('../css/login.css');
+require('../css/login.scss');

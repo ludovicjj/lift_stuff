@@ -5,25 +5,33 @@ main {
     align-items: center;
 }
 /* card */
-.card-login {
+.card-login, .card-logged {
     display: flex;
     flex-direction: column;
-    width: 80%;
+    width: 100%;
     height: fit-content;
     box-shadow: 0 0 15px rgba(0,0,0,0.3);
     border: none;
 }
+.card-logged {
+    max-width: 700px;
+}
 /* card side image */
 .card-img {
     flex: 1 1 auto;
-    background-image: url("../img/mais.jpg");
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center center;
     display: flex;
     padding: 1rem;
     border-radius: var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius) 0 0;
-    height: 300px;
+    height: 230px;
+}
+.card-logged .card-img {
+    background-image: url("../img/fourchette.jpg");
+}
+.card-login .card-img {
+    background-image: url("../img/mais.jpg");
 }
 .card-img .author{
     display: flex;
@@ -57,6 +65,10 @@ main {
 .card-body h5 {
     color: var(--main-color);
 }
+.card-body a {
+    color: var(--main-color);
+    text-decoration: none;
+}
 
 .wrapper-login-action {
     display: flex;
@@ -72,20 +84,32 @@ main {
     .card-login {
         flex-direction: row-reverse;
         height: 790px;
+        & .card-body{
+            width: 50%;
+            flex: 1 1 auto;
+        }
+        & .card-img {
+            width: 50%;
+            flex: 1 1 auto;
+            height: 100%;
+            border-radius: 0 var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius) 0;
+        }
     }
-    .card-body{
+    .card-logged {
         width: 50%;
-        flex: 1 1 auto;
-    }
-    .card-img {
-        width: 50%;
-        flex: 1 1 auto;
-        height: 100%;
-        border-radius: 0 var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius) 0;
+        & .card-img {
+            width: 100%;
+            padding: 1rem;
+            height: 300px;
+            border-radius: var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius) 0 0;
+        }
+        & .card-body {
+            width: 100%;
+        }
     }
     .card-img .author .author_avatar {
-        width: 50px;
-        height: 50px;
+        width: 40px;
+        height: 40px;
     }
     .card-img .author span {
         font-size: 1rem;
