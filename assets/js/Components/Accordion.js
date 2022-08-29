@@ -7,14 +7,13 @@ class Accordion {
         this.btn = this.accordion.querySelector('.accordion-btn');
         this.panel = this.accordion.querySelector('.panel-wrapper');
         this.panelTransitionDuration = this._getTransitionDuration(this.panel);
+        this.isStartOpen = this.accordion.getAttribute('data-acc') === 'show';
 
         this.btn.addEventListener('click', this.handleClick.bind(this))
     }
 
     handleClick() {
-        this.btn.classList.toggle("active");
-
-        if (this.accordion.classList.contains('show')) {
+        if (this.isStartOpen) {
             this._toggleAccordionStartOpen()
         } else {
             this._toggleAccordionStartClose()
@@ -25,6 +24,7 @@ class Accordion {
      * Accordion is open by default
      */
     _toggleAccordionStartOpen() {
+        this.accordion.classList.toggle("close");
         if (this.panel.style.maxHeight) {
             // open panel (Redefine max-height with JS)
             this.panel.style.maxHeight = this.panel.scrollHeight + "px";
@@ -49,6 +49,7 @@ class Accordion {
      * Accordion is close by default
      */
     _toggleAccordionStartClose() {
+        this.accordion.classList.toggle("open");
         if (this.panel.style.maxHeight) {
             this.panel.style.maxHeight = null;
         } else {

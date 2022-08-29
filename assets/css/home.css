@@ -172,9 +172,6 @@ form.js-new-rep-log-form .row .col:last-child {
 }
 
 /* leaderboard table */
-.panel-wrapper {
-    border: 1px solid var(--bs-border-color-translucent);
-}
 .panel-wrapper .panel table {
     border-collapse: separate;
     border-spacing: 0 10px;
@@ -206,15 +203,6 @@ form.js-new-rep-log-form .row .col:last-child {
     transition: border-radius .3s;
     border: 1px solid var(--main-color);
 }
-.accordion-container.show .accordion-btn{
-    border-radius: .375rem .375rem 0 0;
-}
-.accordion-btn.active {
-    border-radius: .375rem .375rem 0 0;
-}
-.accordion-container.show .accordion-btn.active {
-    border-radius: .375rem;
-}
 /* Style the accordion panel. Note: hidden by default */
 .accordion-container .panel-wrapper {
     padding: 0 2rem;
@@ -222,9 +210,27 @@ form.js-new-rep-log-form .row .col:last-child {
     max-height: 0;
     overflow: hidden;
     transition: max-height .3s ease-out;
+    border-radius: 0 0 .375rem .375rem;
+    border: 1px solid var(--bs-gray-200);
 }
-.accordion-container.show .panel-wrapper {
+.accordion-container[data-acc="show"] .panel-wrapper {
     max-height: fit-content;
+    border: 1px solid var(--bs-border-color-translucent);
+}
+.accordion-container.open .panel-wrapper {
+    border: 1px solid var(--bs-border-color-translucent);
+}
+
+.accordion-container[data-acc="show"] .accordion-btn,
+.accordion-container.open .accordion-btn
+{
+    border-radius: .375rem .375rem 0 0;
+}
+.accordion-container.close .accordion-btn{
+    border-radius: .375rem;
+}
+.accordion-container.close .panel-wrapper{
+    border: 1px solid var(--bs-gray-200);
 }
 .panel {
     padding: 1rem 0 2rem;
@@ -232,8 +238,15 @@ form.js-new-rep-log-form .row .col:last-child {
 .panel .table-responsive {
     max-height: 265px;
 }
-.accordion-btn i {
+.accordion-btn .btn-icon {
     transition: transform .3s;
+}
+.accordion-container[data-acc="show"] .btn-icon,
+.accordion-container.open .btn-icon {
+    transform: rotate(180deg);
+}
+.accordion-container.close .btn-icon {
+    transform: rotate(0deg);
 }
 .accordion-btn:hover {
     background-color: var(--main-hover-color);
