@@ -103,11 +103,11 @@ const webpackConfig = {
         }
     },
     devServer: {
-        https: {
-            key: fs.readFileSync("./ssl/cert.key"),
-            cert: fs.readFileSync("./ssl/cert.crt"),
-            ca: fs.readFileSync("./ssl/ca.crt"),
-        },
+        // https: {
+        //     key: fs.readFileSync("./ssl/cert.key"),
+        //     cert: fs.readFileSync("./ssl/cert.crt"),
+        //     ca: fs.readFileSync("./ssl/ca.crt"),
+        // },
         headers: { 'Access-Control-Allow-Origin': '*' },
         port: 8080,
         hot: true
